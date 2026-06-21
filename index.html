@@ -113,7 +113,7 @@
                 var c = line.split('\t'); if(c.length < 2) continue;
                 var v = []; for(var j=0; j<16; j++) { v.push(c[j] ? c[j].trim() : ""); }
                 if (v[1] === "" && lastValidArtist !== "") { v[1] = lastValidArtist; } else if (v[1] !== "") { lastValidArtist = v[1]; }
-                addTableRow(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]); added++;
+                addTableRow(v[0],v[1],v[2],v[3],v[4],v[5],v[6],v[7],v[8],v[9],v[10],v[11],v[12],v[13],v[14],v[15]); added++;
             }
             alert("Імпортовано артистів: " + added);
         });
@@ -130,7 +130,7 @@
         }
         return rows;
     }
-    function splitArtistsSmart(artistField) {
+        function splitArtistsSmart(artistField) {
         var text = artistField.trim(), ex = ["время и стекло", "потап и настя", "міша крупін і корупція", "інді та друзі"];
         for(var e=0; e<ex.length; e++) { if(text.toLowerCase() === ex[e]) return [text]; }
         var norm = text.replace(/\s*,\s*/g, "||").replace(/\s+і\s+/gi, "||").replace(/\s+та\s+/gi, "||").replace(/\s+&\s+/g, "||").replace(/\s*\+\s*/g, "||").replace(/\s+and\s+/gi, "||").replace(/\s+feat\.?\s+/gi, "||").replace(/\s+ft\.?\s+/gi, "||");
@@ -181,8 +181,8 @@
         }
         return htmlResult;
     }
-    function parseDateSmart(str) {
-        var clean = str.trim(), d = new Date(), day = d.getDate(), month = d.getMonth() + 1;
+    function parseDateSmart(linesArray) {
+        var clean = linesArray[0].trim(), d = new Date(), day = d.getDate(), month = d.getMonth() + 1;
         if (clean.indexOf('.') !== -1) {
             var p = clean.split('.'); if (p.length >= 2) { day = parseInt(p[0].replace(/[^\d]/g, ''), 10); month = parseInt(p[1].replace(/[^\d]/g, ''), 10); }
         } else {
@@ -201,8 +201,8 @@
     function goSongs() {
         var raw = document.getElementById('input-songs').value.split('\n'), lines = [];
         for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lines.push(raw[i].trim()); }
-        var out = document.getElementById('out-songs'); out.innerHTML = ''; list = []; if(lines.length < 2) return;
-        var parsed = parseDateSmart(lines[0]), formattedDate = parsed.day + " " + months[parsed.month - 1];
+        var out = document.getElementById('out-songs'); out.innerHTML = ''; list = []; if(lines.length < 2) { alert('Введіть дані!'); return; }
+        var parsed = parseDateSmart(lines), formattedDate = parsed.day + " " + months[parsed.month - 1];
         var endObj = new Date(2026, parsed.month - 1, parsed.day); endObj.setDate(endObj.getDate() + 6); var endDate = endObj.getDate() + " " + months[endObj.getMonth()];
         var mode = document.querySelector('input[name="mode"]:checked').value;
         for(var j=1; j<lines.length; j++) {
@@ -223,10 +223,10 @@
     function goLabels() {
         var raw = document.getElementById('input-labels').value.split('\n'), lbls = [];
         for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lbls.push(raw[i].trim()); }
-        var out = document.getElementById('out-labels'); out.innerHTML = ''; if(list.length === 0) return;
+        var out = document.getElementById('out-labels'); out.innerHTML = ''; if(list.length === 0) { alert('Спочатку сформуйте список пісень!'); return; }
         for(var k=0; k<list.length; k++) {
             if(!lbls[k]) break;
-            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успешно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
+            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успішно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
             var div = document.createElement('div'); div.className = 'text-item'; div.innerHTML = '<div class="text-content">' + txt + '</div>';
             var cHtml = findContacts(list[k].a), cDiv = document.createElement('div'); cDiv.className = 'contacts-block'; cDiv.innerHTML = cHtml; div.appendChild(cDiv);
             var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати'; b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b); div.appendChild(b); out.appendChild(div);
@@ -237,3 +237,4 @@
 </script>
 </body>
 </html>
+
