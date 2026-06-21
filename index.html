@@ -6,7 +6,7 @@
     <title>Генератор Радіо Промінь</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
-        .container { max-width: 700px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 750px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #2c3e50; }
         .tabs { display: flex; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 10px; background: #eee; border: none; cursor: pointer; font-weight: bold; }
@@ -18,7 +18,9 @@
         button:hover { background: #27ae60; }
         .text-item { background: #eef2f5; border-left: 5px solid #3498db; padding: 15px; margin-top: 15px; border-radius: 4px; position: relative; }
         .copy-btn { position: absolute; top: 10px; right: 10px; width: auto; padding: 5px 10px; font-size: 12px; background: #34495e; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .text-content { font-size: 14px; line-height: 1.5; margin-right: 90px; white-space: pre-wrap; }
+        .text-content { font-size: 14px; line-height: 1.5; margin-right: 110px; white-space: pre-wrap; }
+        .contacts-block { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; font-size: 13px; color: #475569; }
+        .hint { color: #7f8c8d; font-size: 13px; margin-top: 2px; line-height: 1.4; margin-bottom: 8px; }
     </style>
 </head>
 <body>
@@ -29,10 +31,11 @@
     <div class="tabs">
         <button class="tab-btn active" id="t1" onclick="tab('songs')">1. Пісні</button>
         <button class="tab-btn" id="t2" onclick="tab('labels')">2. Лейбли</button>
+        <button class="tab-btn" id="t3" onclick="tab('database')">3. Контакти артистів</button>
     </div>
 
     <div id="songs" class="tab-content active">
-        <textarea id="input-songs" placeholder="22.06&#10;1.Нуга - Пам&#39;ятай мене 3 - 02:20"></textarea>
+        <textarea id="input-songs" placeholder="22.06&#10;1.Нуга & СКАЙ - Пам&#39;ятай мене - 02:20"></textarea>
         <div style="margin: 10px 0;">
             <label><input type="radio" name="mode" value="reg" checked> Звичайна ротація</label>
             <label style="margin-left: 20px;"><input type="radio" name="mode" value="prom"> Промінь рекомендує</label>
@@ -46,18 +49,30 @@
         <button onclick="goLabels()">Згенерувати лейбли</button>
         <div id="out-labels"></div>
     </div>
+
+    <div id="database" class="tab-content">
+        <div class="hint">Скопіюйте стовпці з Excel (Виконавець, Telegram, Instagram тощо) та вставте сюди:</div>
+        <textarea id="input-database" placeholder="Нуга	@nuga_tg	@nuga_inst&#10;СКАЙ	@skay_tg	@skay_inst"></textarea>
+        <button onclick="saveDatabase()">Оновити базу контактів</button>
+    </div>
 </div>
 <script>
     var list = [];
+    var contactsDb = {};
     var months = ["січня", "лютого", "березня", "квітня", "травня", "червня", "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"];
 
     function tab(name) {
         document.getElementById('songs').className = 'tab-content';
         document.getElementById('labels').className = 'tab-content';
+        document.getElementById('database').className = 'tab-content';
         document.getElementById('t1').className = 'tab-btn';
         document.getElementById('t2').className = 'tab-btn';
+        document.getElementById('t3').className = 'tab-btn';
         document.getElementById(name).className = 'tab-content active';
-        document.getElementById(name === 'songs' ? 't1' : 't2').className = 'tab-btn active';
+        
+        if(name === 'songs') document.getElementById('t1').className = 'tab-btn active';
+        if(name === 'labels') document.getElementById('t2').className = 'tab-btn active';
+        if(name === 'database') document.getElementById('t3').className = 'tab-btn active';
     }
 
     function copy(btn, txt) {
@@ -67,13 +82,51 @@
         setTimeout(function() { btn.innerText = 'Копіювати'; btn.style.background = '#34495e'; }, 1000);
     }
 
-    function parseDateSmart(str) {
-        var clean = str.trim();
-        var d = new Date();
-        var day = d.getDate();
-        var month = d.getMonth() + 1;
+    function saveDatabase() {
+        var raw = document.getElementById('input-database').value.split('\n');
+        contactsDb = {};
+        var count = 0;
+        for (var i = 0; i < raw.length; i++) {
+            var line = raw[i].trim();
+            if (line === '') continue;
+            var parts = line.split('\t');
+            if (parts.length >= 1) {
+                var artistName = parts[0].trim().toLowerCase();
+                var info = [];
+                for (var j = 1; j < parts.length; j++) {
+                    if (parts[j].trim() !== '') info.push(parts[j].trim());
+                }
+                contactsDb[artistName] = info.join(' | ');
+                count++;
+            }
+        }
+        alert('Базу оновлено! Завантажено артистів: ' + count);
+    }
 
-        // Варіант 1: якщо у рядку є точки (наприклад: 22.06 або 22.06.2026)
+    function findContacts(artistField) {
+        var names = artistField.split(/ [&,+] | and | feat\.? | ft\.? /i);
+        if (names.length === 1 && artistField.indexOf('&') !== -1) { names = artistField.split('&'); }
+        if (names.length === 1 && artistField.indexOf(',') !== -1) { names = artistField.split(','); }
+        
+        var htmlResult = "";
+        var foundAny = false;
+        
+        for (var i = 0; i < names.length; i++) {
+            var searchName = names[i].trim();
+            var lowerName = searchName.toLowerCase();
+            if (searchName === '') continue;
+            
+            if (contactsDb[lowerName]) {
+                htmlResult += "<div><strong>" + searchName + ":</strong> " + contactsDb[lowerName] + "</div>";
+                foundAny = true;
+            } else {
+                htmlResult += "<div><strong>" + searchName + ":</strong> <span style='color:#94a3b8;'>контакти не знайдені</span></div>";
+            }
+        }
+        return htmlResult;
+    }
+    function parseDateSmart(str) {
+        var clean = str.trim(); var d = new Date(); var day = d.getDate(); var month = d.getMonth() + 1;
         if (clean.indexOf('.') !== -1) {
             var parts = clean.split('.');
             if (parts.length >= 2) {
@@ -81,9 +134,7 @@
                 var p1 = parseInt(parts[1].replace(/[^\d]/g, ''), 10);
                 if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; }
             }
-        } 
-        // Варіант 2: якщо це суцільні цифри без крапок (наприклад: 220626 або 2206)
-        else {
+        } else {
             var digits = clean.replace(/[^\d]/g, '');
             if (digits.length >= 4) {
                 var p0 = parseInt(digits.substring(0, 2), 10);
@@ -91,10 +142,7 @@
                 if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; }
             }
         }
-
-        if (month < 1 || month > 12) month = 6;
-        if (day < 1 || day > 31) day = 22;
-
+        if (month < 1 || month > 12) month = 6; if (day < 1 || day > 31) day = 22;
         return { day: day, month: month };
     }
 
@@ -102,9 +150,7 @@
         var clean = name.replace(/&amp;#39;/g, "'").replace(/&#39;/g, "'").trim();
         var trash = [" 3", " 2", " 1", " 2s", " 3d", " ч.3.", " ч.3", " ч.2", " ч.1"];
         for (var i = 0; i < trash.length; i++) {
-            if (clean.endsWith(trash[i])) {
-                clean = clean.substring(0, clean.length - trash[i].length).trim();
-            }
+            if (clean.endsWith(trash[i])) { clean = clean.substring(0, clean.length - trash[i].length).trim(); }
         }
         return clean;
     }
@@ -117,28 +163,20 @@
         var out = document.getElementById('out-songs'); out.innerHTML = ''; list = [];
         if(lines.length < 2) { alert('Введіть дату в першому рядку і пісні нижче!'); return; }
         
-        var rawDateLine = lines[0];
-        var parsed = parseDateSmart(rawDateLine);
-        
+        var rawDateLine = lines[0]; var parsed = parseDateSmart(rawDateLine);
         var formattedDate = parsed.day + " " + months[parsed.month - 1];
         
-        var endObj = new Date(2026, parsed.month - 1, parsed.day);
-        endObj.setDate(endObj.getDate() + 6);
+        var endObj = new Date(2026, parsed.month - 1, parsed.day); endObj.setDate(endObj.getDate() + 6);
         var endDate = endObj.getDate() + " " + months[endObj.getMonth()];
-
         var mode = document.querySelector('input[name="mode"]:checked').value;
 
         for(var j=1; j<lines.length; j++) {
             var currentLine = lines[j];
             var withoutNumber = currentLine.substring(currentLine.indexOf('.') + 1).trim();
-            
             var parts = withoutNumber.split(/[-–—]/);
             if(parts.length < 2) continue;
 
-            var artist = parts[0].trim();
-            var song = parts[1].trim();
-            var time = parts[2] ? parts[2].trim() : '00:00';
-            
+            var artist = parts[0].trim(); var song = parts[1].trim(); var time = parts[2] ? parts[2].trim() : '00:00';
             song = cleanSongField(song);
             list.push({a: artist, s: song});
 
@@ -151,6 +189,11 @@
 
             var div = document.createElement('div'); div.className = 'text-item';
             div.innerHTML = '<div class="text-content">' + txt + '</div>';
+            
+            var contactsHtml = findContacts(artist);
+            var contactsDiv = document.createElement('div'); contactsDiv.className = 'contacts-block';
+            contactsDiv.innerHTML = contactsHtml; div.appendChild(contactsDiv);
+
             var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
             b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
             div.appendChild(b); out.appendChild(div);
@@ -169,6 +212,11 @@
             var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успішно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
             var div = document.createElement('div'); div.className = 'text-item';
             div.innerHTML = '<div class="text-content">' + txt + '</div>';
+            
+            var contactsHtml = findContacts(list[k].a);
+            var contactsDiv = document.createElement('div'); contactsDiv.className = 'contacts-block';
+            contactsDiv.innerHTML = contactsHtml; div.appendChild(contactsDiv);
+
             var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
             b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
             div.appendChild(b); out.appendChild(div);
