@@ -18,6 +18,7 @@
         button:hover { background: #27ae60; }
         .btn-blue { background: #3498db; } .btn-blue:hover { background: #2980b9; }
         .btn-red { background: #e74c3c; padding: 6px 10px; font-size: 12px; } .btn-red:hover { background: #c0392b; }
+        
         .text-item { background: #eef2f5; border-left: 5px solid #3498db; padding: 15px; margin-top: 15px; border-radius: 4px; position: relative; }
         .item-header { font-weight: bold; color: #2c3e50; margin-bottom: 10px; font-size: 14px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px; padding-right: 110px; }
         .copy-btn { position: absolute; top: 12px; right: 15px; width: auto; padding: 6px 12px; font-size: 12px; background: #34495e; color: white; border: none; border-radius: 4px; cursor: pointer; z-index: 10; }
@@ -126,13 +127,13 @@
         document.body.removeChild(el);
         alert("Усі тексти успішно скопійовано!");
     }
+
     function addTableRow(v0="",v1="",v2="",v3="",v4="",v5="",v6="",v7="",v8="",v9="",v10="",v11="",v12="",v13="",v14="",v15="") {
         var tbody = document.getElementById('table-body');
         var tr = document.createElement('tr');
         tr.innerHTML = '<td><input type="text" class="c-num" value="'+v0+'"></td><td><input type="text" class="c-artist" value="'+v1+'"></td><td><input type="text" class="c-name" value="'+v2+'"></td><td><input type="text" class="c-role" value="'+v3+'"></td><td><input type="text" class="c-place" value="'+v4+'"></td><td><input type="text" class="c-m" value="'+v5+'"></td><td><input type="text" class="c-d" value="'+v6+'"></td><td><input type="text" class="c-tg" value="'+v7+'"></td><td><input type="text" class="c-inst" value="'+v8+'"></td><td><input type="text" class="c-fb" value="'+v9+'"></td><td><input type="text" class="c-phone" value="'+v10+'"></td><td><input type="text" class="c-mname" value="'+v11+'"></td><td><input type="text" class="c-mpos" value="'+v12+'"></td><td><input type="text" class="c-mtg" value="'+v13+'"></td><td><input type="text" class="c-minst" value="'+v14+'"></td><td><input type="text" class="c-mphone" value="'+v15+'"></td><td style="text-align:center;"><button class="btn-red" onclick="this.parentElement.parentElement.remove()">❌</button></td>';
         tbody.appendChild(tr);
     }
-
     function pasteFromExcel() {
         navigator.clipboard.readText().then(function(text) {
             if (!text || text.trim() === "") return;
@@ -149,12 +150,12 @@
                 for (var j = 0; j < 16; j++) {
                     v.push(c[j] ? c[j].trim() : "");
                 }
-                if (v === "" && lastValidArtist !== "") {
-                    v = lastValidArtist;
-                } else if (v !== "") {
-                    lastValidArtist = v;
+                if (v[1] === "" && lastValidArtist !== "") {
+                    v[1] = lastValidArtist;
+                } else if (v[1] !== "") {
+                    lastValidArtist = v[1];
                 }
-                addTableRow(v, v, v, v, v, v, v, v, v, v, v, v, v, v, v, v);
+                addTableRow(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]);
                 added++;
             }
             alert("Імпортовано артистів: " + added);
@@ -169,14 +170,23 @@
             if (art === "") continue;
             rows.push({
                 searchName: art.toLowerCase(),
-                artist: art, realName: trs[i].querySelector('.c-name').value.trim(), role: trs[i].querySelector('.c-role').value.trim(), place: trs[i].querySelector('.c-place').value.trim(),
-                tg: trs[i].querySelector('.c-tg').value.trim(), inst: trs[i].querySelector('.c-inst').value.trim(), fb: trs[i].querySelector('.c-fb').value.trim(), phone: trs[i].querySelector('.c-phone').value.trim(),
-                mName: trs[i].querySelector('.c-mname').value.trim(), mPos: trs[i].querySelector('.c-mpos').value.trim(), mTg: trs[i].querySelector('.c-mtg').value.trim(), mInst: trs[i].querySelector('.c-minst').value.trim(), mPhone: trs[i].querySelector('.c-mphone').value.trim()
+                artist: art,
+                realName: trs[i].querySelector('.c-name').value.trim(),
+                role: trs[i].querySelector('.c-role').value.trim(),
+                place: trs[i].querySelector('.c-place').value.trim(),
+                tg: trs[i].querySelector('.c-tg').value.trim(),
+                inst: trs[i].querySelector('.c-inst').value.trim(),
+                fb: trs[i].querySelector('.c-fb').value.trim(),
+                phone: trs[i].querySelector('.c-phone').value.trim(),
+                mName: trs[i].querySelector('.c-mname').value.trim(),
+                mPos: trs[i].querySelector('.c-mpos').value.trim(),
+                mTg: trs[i].querySelector('.c-mtg').value.trim(),
+                mInst: trs[i].querySelector('.c-minst').value.trim(),
+                mPhone: trs[i].querySelector('.c-mphone').value.trim()
             });
         }
         return rows;
     }
-
     function splitArtistsSmart(artistField) {
         var text = artistField.trim();
         var ex = ["время и стекло", "потап и настя", "міша крупін і корупція", "інді та друзі"];
