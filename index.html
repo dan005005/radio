@@ -67,35 +67,40 @@
         setTimeout(function() { btn.innerText = 'Копіювати'; btn.style.background = '#34495e'; }, 1000);
     }
 
-    function parseUaDate(str) {
-        var clean = str.replace(/[^\d\.]/g, '');
-        var day = "", month = "", year = "2026";
-        if (clean.indexOf('.') !== -1) {
-            var p = clean.split('.'); day = parseInt(p[0], 10); month = parseInt(p[1], 10);
-            if(p[2]) { year = p[2].length === 2 ? "20" + p[2] : p[2]; }
-        } else if (clean.length >= 4) {
-            day = parseInt(clean.substring(0, 2), 10); month = parseInt(clean.substring(2, 4), 10);
-            if(clean.length >= 6) { year = "20" + clean.substring(4, 6); }
-        } else { return str; }
-        if (!isNaN(day) && !isNaN(month) && month >= 1 && month <= 12) {
-            return day + " " + months[month - 1] + " " + year;
+    function convertDateToText(str) {
+        var s = str.trim();
+        var d = s.substring(0, 2);
+        var m = s.substring(2, 4);
+        var dayInt = parseInt(d, 10);
+        var monthInt = parseInt(m, 10);
+        
+        if (!isNaN(dayInt) && !isNaN(monthInt) && monthInt >= 1 && monthInt <= 12) {
+            return dayInt + " " + months[monthInt - 1];
         }
-        return str;
+        return "22 червня";
     }
 
-    function addDaysUa(dateStr, days) {
-        var clean = dateStr.replace(/[^\d\.]/g, '');
-        var day = parseInt(clean.substring(0,2),10), month = parseInt(clean.substring(2,4),10)-1, year = 2026;
-        if(clean.indexOf('.') !== -1){ var p=clean.split('.'); day=parseInt(p[0],10); month=parseInt(p[1],10)-1; }
-        var d = new Date(year, month, day); d.setDate(d.getDate() + days);
-        return d.getDate() + " " + months[d.getMonth()] + " " + d.getFullYear();
+    function getEndDateText(str) {
+        var s = str.trim();
+        var d = parseInt(s.substring(0, 2), 10);
+        var m = parseInt(s.substring(2, 4), 10) - 1;
+        if (isNaN(d) || isNaN(m)) return "28 червня";
+        var dateObj = new Date(2026, m, d);
+        dateObj.setDate(dateObj.getDate() + 6);
+        return dateObj.getDate() + " " + months[dateObj.getMonth()];
     }
 
-    function cleanSongName(name) {
-        var res = name.replace(/&amp;#39;/g, "'").replace(/&#39;/g, "'").trim();
-        res = res.replace(/\s+\d+[a-zA-Zа-яА-ЯіІёЁ]*\s*$/, '');
-        res = res.replace(/\s+ч\.\d+\.*\s*$/, '');
-        return res.trim();
+    function cleanSongField(name) {
+        var clean = name.replace(/&amp;#39;/g, "'").replace(/&#39;/g, "'").trim();
+        
+        // Массив хвостиков для удаления в конце названия песни
+        var trash = [" 3", " 2", " 1", " 2s", " 3d", " ч.3.", " ч.3", " ч.2", " ч.1"];
+        for (var i = 0; i < trash.length; i++) {
+            if (clean.endsWith(trash[i])) {
+                clean = clean.substring(0, clean.length - trash[i].length).trim();
+            }
+        }
+        return clean;
     }
 
     function goSongs() {
@@ -107,27 +112,29 @@
         if(lines.length < 2) { alert('Введіть дату в першому рядку і пісні нижче!'); return; }
         
         var rawDate = lines[0];
-        var formattedDate = parseUaDate(rawDate);
+        var formattedDate = convertDateToText(rawDate);
         var mode = document.querySelector('input[name="mode"]:checked').value;
 
         for(var j=1; j<lines.length; j++) {
-            var str = lines[j].replace(/^\d+[\.\)\s:-]*/, '').trim();
-            var p = str.split(/[-–—]/);
-            if(p.length < 2) continue;
-
-            var art = p[0].trim(); 
-            var sng = cleanSongName(p[1]); 
-            var tm = p[2] ? p[2].trim() : '00:00';
-            if (p.length > 3) { tm = p[p.length-1].trim(); sng = ""; for(var x=1; x<p.length-1; x++) { sng += (x>1 ? " - " : "") + p[x]; } sng = cleanSongName(sng); }
+            var currentLine = lines[j];
+            var withoutNumber = currentLine.substring(currentLine.indexOf('.') + 1).trim();
             
-            list.push({a: art, s: sng});
+            var parts = withoutNumber.split(/[-–—]/);
+            if(parts.length < 2) continue;
+
+            var artist = parts[0].trim();
+            var song = parts[1].trim();
+            var time = parts[2] ? parts[2].trim() : '00:00';
+            
+            song = cleanSongField(song);
+            list.push({a: artist, s: song});
+
             var txt = '';
             if(mode === 'reg') {
-                txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nХочу повідомити, що пісня «" + art + "» — «" + sng + "» " + formattedDate + " стартуватиме в ротації Радіо Промінь. Перший ефір відбудеться о «" + tm + "».";
+                txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nХочу повідомити, що пісня «" + artist + "» — «" + song + "» " + formattedDate + " стартуватиме в ротації Радіо Промінь. Перший ефір відбудеться о «" + time + "».";
             } else {
-                var endDate = addDaysUa(rawDate, 6);
-                txt = "Вітаю.
-Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець. Хочу повідомити, що пісня «" + art + "» — «" + sng + "» завтра (" + formattedDate + ") стартуватиме на Радіо Промінь в рубриці «Промінь рекомендує». Перший ефір буде завтра о «" + tm + "». Гратиме щодня протягом тижня (до неділі, " + endDate + " включно) 1–2 рази на день в цій же рубриці в різний час, а потім переходить в загальну ротацію.";
+                var endDate = getEndDateText(rawDate);
+                txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець. Хочу повідомити, що пісня «" + artist + "» — «" + song + "» завтра (" + formattedDate + ") стартуватиме на Радіо Промінь в рубриці «Промінь рекомендує». Перший ефір буде завтра о «" + time + "». Гратиме щодня протягом тижня (до неділі, " + endDate + " включно) 1–2 рази на день в цій же рубриці в різний час, а потім переходить в загальну ротацію.";
             }
 
             var div = document.createElement('div'); div.className = 'text-item';
