@@ -282,8 +282,7 @@
             }
         }
         return htmlResult;
-    }
-    function parseDateSmart(str) {
+    }    function parseDateSmart(str) {
         var clean = str.trim(); var d = new Date(); var day = d.getDate(); var month = d.getMonth() + 1;
         if (clean.indexOf('.') !== -1) {
             var parts = clean.split('.');
@@ -378,3 +377,4 @@
 </script>
 </body>
 </html>
+
