@@ -3,195 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор текстів — Радіо Промінь</title>
+    <title>Генератор Радіо Промінь</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 750px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #2c3e50; margin-top: 0; }
-        .tabs { display: flex; border-bottom: 2px solid #ddd; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; text-align: center; background: #eee; cursor: pointer; border: none; font-size: 16px; font-weight: bold; }
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; }
+        .tabs { display: flex; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; background: #eee; border: none; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: #3498db; color: white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        label { font-weight: bold; display: block; margin: 15px 0 5px; }
-        textarea { width: 100%; height: 160px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; resize: vertical; }
-        .radio-group { margin: 15px 0; }
-        .radio-group label { display: inline-block; margin-right: 20px; cursor: pointer; }
-        button { width: 100%; padding: 12px; background: #2ecc71; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        textarea { width: 100%; height: 150px; padding: 10px; box-sizing: border-box; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background: #2ecc71; color: white; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
         button:hover { background: #27ae60; }
-        .results-container { margin-top: 20px; }
-        .text-item { background: #eef2f5; border-left: 5px solid #3498db; padding: 15px; margin-bottom: 15px; border-radius: 0 4px 4px 0; position: relative; }
-        .text-content { white-space: pre-wrap; font-size: 14px; line-height: 1.5; margin-right: 110px; }
-        .copy-btn { position: absolute; top: 15px; right: 15px; padding: 6px 12px; font-size: 12px; background: #34495e; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .error-item { border-left-color: #e74c3c; background: #fde8e7; }
-        .alert { padding: 10px; background: #ffeb3b; color: #333; border-radius: 4px; margin-top: 10px; font-size: 14px; display: none; }
-        .hint { color: #7f8c8d; font-size: 13px; margin-top: 2px; line-height: 1.4; }
+        .text-item { background: #eef2f5; border-left: 5px solid #3498db; padding: 15px; margin-top: 15px; border-radius: 4px; position: relative; }
+        .copy-btn { position: absolute; top: 10px; right: 10px; width: auto; padding: 5px 10px; font-size: 12px; background: #34495e; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .text-content { font-size: 14px; line-height: 1.5; margin-right: 90px; white-space: pre-wrap; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>📻 Генератор текстів для Радіо Промінь</h2>
+    <h2>📻 Генератор текстів — Радіо Промінь</h2>
     
     <div class="tabs">
-        <button class="tab-btn active" id="btn-tab1" onclick="switchTab('songs-tab')">1. Пісні та Ротація</button>
-        <button class="tab-btn" id="btn-tab2" onclick="switchTab('labels-tab')">2. Тексти для Лейблів</button>
+        <button class="tab-btn active" id="t1" onclick="tab('songs')">1. Пісні</button>
+        <button class="tab-btn" id="t2" onclick="tab('labels')">2. Лейбли</button>
     </div>
 
-    <div id="songs-tab" class="tab-content active">
-        <label for="songs-input">Вставте список пісень:</label>
-        <div class="hint">
-            <strong>Перший рядок:</strong> загальна дата (наприклад: 22.06)<br>
-            <strong>Наступні рядки:</strong> Виконавець - Назва пісні - Час першого ефіру
+    <div id="songs" class="tab-content active">
+        <textarea id="input-songs" placeholder="22.06&#10;1. CHIROSI - Забувай - 00:40"></textarea>
+        <div style="margin: 10px 0;">
+            <label><input type="radio" name="mode" value="reg" checked> Звичайна ротація</label>
+            <label style="margin-left: 20px;"><input type="radio" name="mode" value="prom"> Промінь рекомендує</label>
         </div>
-        <textarea id="songs-input" placeholder="22.06&#10;1. Океан Ельзи - Без бою - 14:15&#10;2. Бумбокс - Вахтерам - 10:30"></textarea>
-        
-        <div class="radio-group">
-            <label><input type="radio" name="rotation" value="regular" checked> Звичайна ротація</label>
-            <label><input type="radio" name="rotation" value="promin"> Промінь рекомендує</label>
-        </div>
-        
-        <button onclick="generateSongs()">Згенерувати тексти листів</button>
-        
-        <label style="margin-top: 25px;">Результати:</label>
-        <div id="songs-output-list" class="results-container"></div>
+        <button onclick="goSongs()">Згенерувати тексти</button>
+        <div id="out-songs"></div>
     </div>
 
-    <div id="labels-tab" class="tab-content">
-        <div id="label-alert" class="alert"></div>
-        <label for="labels-input">Вставте список лейблів (по одному в рядку):</label>
-        <textarea id="labels-input" placeholder="Лейбл 1&#10;Лейбл 2"></textarea>
-        
-        <button onclick="generateLabels()">Згенерувати тексти для лейблів</button>
-<label style="margin-top: 25px;">Результати для лейблів:</label>
-        <div id="labels-output-list" class="results-container"></div>
+    <div id="labels" class="tab-content">
+        <textarea id="input-labels" placeholder="Введіть лейбли, кожен з нового рядка"></textarea>
+        <button onclick="goLabels()">Згенерувати лейбли</button>
+        <div id="out-labels"></div>
     </div>
 </div>
-
 <script>
-    var globalSongs = [];
+    var list = [];
 
-    function switchTab(tabId) {
-        document.getElementById('songs-tab').className = 'tab-content';
-        document.getElementById('labels-tab').className = 'tab-content';
-        document.getElementById('btn-tab1').className = 'tab-btn';
-        document.getElementById('btn-tab2').className = 'tab-btn';
+    function tab(name) {
+        document.getElementById('songs').className = 'tab-content';
+        document.getElementById('labels').className = 'tab-content';
+        document.getElementById('t1').className = 'tab-btn';
+        document.getElementById('t2').className = 'tab-btn';
+        document.getElementById(name).className = 'tab-content active';
+        document.getElementById(name === 'songs' ? 't1' : 't2').className = 'tab-btn active';
+    }
+
+    function copy(btn, txt) {
+        var el = document.createElement('textarea');
+        el.value = txt; document.body.appendChild(el); el.select();
+        document.execCommand('copy'); document.body.removeChild(el);
+        btn.innerText = 'Готово!'; btn.style.background = '#2ecc71';
+        setTimeout(function() { btn.innerText = 'Копіювати'; btn.style.background = '#34495e'; }, 1000);
+    }
+
+    function goSongs() {
+        var raw = document.getElementById('input-songs').value.split('\n');
+        var lines = [];
+        for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lines.push(raw[i].trim()); }
         
-        document.getElementById(tabId).className = 'tab-content active';
-        document.getElementById(tabId === 'songs-tab' ? 'btn-tab1' : 'btn-tab2').className = 'tab-btn active';
+        var out = document.getElementById('out-songs'); out.innerHTML = ''; list = [];
+        if(lines.length < 2) { alert('Введіть дату в першому рядку і пісні нижче!'); return; }
+        
+        var date = lines[0];
+        var mode = document.querySelector('input[name="mode"]:checked').value;
 
-        var alertBox = document.getElementById('label-alert');
-        if(tabId === 'labels-tab') {
-            alertBox.style.display = 'block';
-            if (globalSongs.length === 0) {
-                alertBox.style.background = '#ffeb3b'; alertBox.style.color = '#333';
-                alertBox.innerText = "⚠️ Увага: Спочатку згенеруйте пісні на першій вкладці!";
+        for(var j=1; j<lines.length; j++) {
+            var str = lines[j].replace(/^\d+[\.\)\s:-]*/, '').trim();
+            var p = str.split(/[-–—]/);
+            if(p.length < 2) continue;
+
+            var art = p[0].trim(); var sng = p[1].trim(); 
+            var tm = p[2] ? p[2].trim() : '00:00';
+            list.push({a: art, s: sng});
+
+            var txt = '';
+            if(mode === 'reg') {
+                txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nХочу повідомити, що пісня «" + art + "» — «" + sng + "» " + date + " стартуватиме в ротації Радіо Промінь. Перший ефір відбудеться о «" + tm + "».";
             } else {
-                alertBox.style.background = '#d4edda'; alertBox.style.color = '#155724';
-                alertBox.innerText = "✅ Знайдено треків для лейблів: " + globalSongs.length + ".";
+                txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець. Хочу повідомити, що пісня «" + art + "» — «" + sng + "» завтра (" + date + ") стартуватиме на Радіо Промінь в рубриці «Промінь рекомендує». Перший ефір буде завтра о «" + tm + "». Гратиме щодня протягом тижня 1–2 рази на день в цій же рубриці в різний час, а потім переходить в загальну ротацію.";
             }
+
+            var div = document.createElement('div'); div.className = 'text-item';
+            div.innerHTML = '<div class="text-content">' + txt + '</div>';
+            var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
+            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
+            div.appendChild(b); out.appendChild(div);
         }
     }
 
-    function calculateEndDate(dateStr) {
-        try {
-            var dots = dateStr.trim().split('.');
-            if (dots.length < 2) return dateStr + " + 6 днів";
-            var dObj = new Date(new Date().getFullYear(), parseInt(dots[1], 10) - 1, parseInt(dots[0], 10));
-            dObj.setDate(dObj.getDate() + 6);
-            var rDay = String(dObj.getDate()).padStart(2, '0');
-            var rMonth = String(dObj.getMonth() + 1).padStart(2, '0');
-            return rDay + "." + rMonth;
-        } catch(e) { return dateStr + " + 6 днів"; }
-    }
-
-    function copyText(text) {
-        var dummy = document.createElement("textarea");
-        document.body.appendChild(dummy);
-        dummy.value = text; dummy.select();
-        document.execCommand("copy");
-        document.body.removeChild(dummy);
-    }
-
-    function generateSongs() {
-        var textInput = document.getElementById('songs-input').value;
-        var mode = document.querySelector('input[name="rotation"]:checked').value;
-        var lines = textInput.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l !== ""; });
-        var container = document.getElementById('songs-output-list');
+    function goLabels() {
+        var raw = document.getElementById('input-labels').value.split('\n');
+        var lbls = [];
+        for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lbls.push(raw[i].trim()); }
         
-        container.innerHTML = ""; globalSongs = [];
-        if (lines.length < 2) { alert("Введіть дату в першому рядку, а нижче — список пісень."); return; }
+        var out = document.getElementById('out-labels'); out.innerHTML = '';
+        if(list.length === 0) { alert('Спочатку згенеруйте список пісень!'); return; }
 
-        var inputDate = lines[0];
-        
-        for (var j = 1; j < lines.length; j++) {
-            var cleanLine = lines[j].replace(/^\d+[\.\)\s:-]*/, '').trim();
-            var chunks = cleanLine.split(/[-–—]/).map(function(c) { return c.trim(); });
-            var card = document.createElement('div');
-            card.className = 'text-item';
-
-            if (chunks.length >= 2) {
-                var artist = chunks[0];
-                var song = chunks[1];
-                var time = chunks[2] ? chunks[2] : "[Час не вказано]";
-                globalSongs.push({ artist: artist, song: song });
-                
-                var letterText = "";
-                if (mode === 'regular') {
-                    letterText = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nХочу повідомити, що пісня «" + artist + "» — «" + song + "» " + inputDate + " стартуватиме в ротації Радіо Промінь. Перший ефір відбудеться о «" + time + "».";
-                } else {
-                    var finalWeekDate = calculateEndDate(inputDate);
-                    letterText = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець. Хочу повідомити, що пісня «" + artist + "» — «" + song + "» завтра (" + inputDate + ") стартуватиме на Радіо Промінь в рубриці «Промінь рекомендує». Перший ефір буде завтра о «" + time + "».
-Гратиме щодня протягом тижня (до неділі, " + finalWeekDate + " включно) 1–2 рази на день в цій же рубриці в різний час, а потім переходить в загальну ротацію.";
-                }
-                
-                card.innerHTML = '<div class="text-content">' + letterText + '</div>';
-                var btn = document.createElement('button');
-                btn.className = 'copy-btn'; btn.innerText = 'Копіювати';
-                
-                (function(txt, b) {
-                    b.onclick = function() {
-                        copyText(txt); b.innerText = "Готово!"; b.style.background = "#2ecc71";
-                        setTimeout(function() { b.innerText = "Копіювати"; b.style.background = "#34495e"; }, 1200);
-                    };
-                })(letterText, btn);
-                card.appendChild(btn);
-            } else {
-                card.className = 'text-item error-item';
-                card.innerHTML = '<div class="text-content" style="color: #c0392b;">Не вдалося розпізнати рядок: "' + lines[j] + '". Перевірте дефіс.</div>';
-            }
-            container.appendChild(card);
+        for(var k=0; k<list.length; k++) {
+            if(!lbls[k]) break;
+            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успішно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
+            
+            var div = document.createElement('div'); div.className = 'text-item';
+            div.innerHTML = '<div class="text-content">' + txt + '</div>';
+            var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
+            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
+            div.appendChild(b); out.appendChild(div);
         }
     }
-
-    function generateLabels() {
-        var container = document.getElementById('labels-output-list');
-        container.innerHTML = "";
-        if (globalSongs.length === 0) { alert("Спочатку згенеруйте пісні на першій вкладці!"); return; }
-
-        var labels = document.getElementById('labels-input').value.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l !== ""; });
-
-        for (var k = 0; k < globalSongs.length; k++) {
-            var songData = globalSongs[k];
-            var card = document.createElement('div');
-            card.className = 'text-item';
-
-            if (k < labels.length) {
-var labelText = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + songData.song + "» від виконавця «" + songData.artist + "» успішно додано до ефірної сітки під лейблом «" + labels[k] + "». Дякуємо за співпрацю!";
-card.innerHTML = '' + labelText + '';
-var btn = document.createElement('button');
-btn.className = 'copy-btn'; btn.innerText = 'Копіювати';
-(function(txt, b) {
-b.onclick = function() {
-copyText(txt); b.innerText = "Готово!"; b.style.background = "#2ecc71";
-setTimeout(function() { b.innerText = "Копіювати"; b.style.background = "#34495e"; }, 1200);
-};
-})(labelText, btn);
-card.appendChild(btn);
-} else {
-card.className = 'text-item error-item';
-card.innerHTML = 'Лейбл для пісні «' + songData.song + '» не вказаний.';
-}
-container.appendChild(card);
-}
-}
+</script>
+</body>
+</html>
