@@ -32,7 +32,7 @@
     </div>
 
     <div id="songs" class="tab-content active">
-        <textarea id="input-songs" placeholder="220626 ч.3.&#10;1.Нуга - Пам&#39;ятай мене 3 - 02:20"></textarea>
+        <textarea id="input-songs" placeholder="22.06&#10;1.Нуга - Пам&#39;ятай мене 3 - 02:20"></textarea>
         <div style="margin: 10px 0;">
             <label><input type="radio" name="mode" value="reg" checked> Звичайна ротація</label>
             <label style="margin-left: 20px;"><input type="radio" name="mode" value="prom"> Промінь рекомендує</label>
@@ -67,33 +67,34 @@
         setTimeout(function() { btn.innerText = 'Копіювати'; btn.style.background = '#34495e'; }, 1000);
     }
 
-    function convertDateToText(str) {
-        var s = str.trim();
-        var d = s.substring(0, 2);
-        var m = s.substring(2, 4);
-        var dayInt = parseInt(d, 10);
-        var monthInt = parseInt(m, 10);
-        
-        if (!isNaN(dayInt) && !isNaN(monthInt) && monthInt >= 1 && monthInt <= 12) {
-            return dayInt + " " + months[monthInt - 1];
+    function parseDateObject(str) {
+        var clean = str.trim().replace(/[^\d]/g, '');
+        var d = 22, m = 6;
+        if (str.indexOf('.') !== -1) {
+            var parts = str.split('.');
+            if(parts.length >= 2) { d = parseInt(parts[0], 10); m = parseInt(parts[1], 10); }
+        } else if (clean.length >= 4) {
+            d = parseInt(clean.substring(0, 2), 10);
+            m = parseInt(clean.substring(2, 4), 10);
         }
-        return "22 червня";
+        if (isNaN(d) || isNaN(m) || m < 1 || m > 12) { d = 22; m = 6; }
+        return { day: d, month: m };
+    }
+
+    function convertDateToText(str) {
+        var parsed = parseDateObject(str);
+        return parsed.day + " " + months[parsed.month - 1];
     }
 
     function getEndDateText(str) {
-        var s = str.trim();
-        var d = parseInt(s.substring(0, 2), 10);
-        var m = parseInt(s.substring(2, 4), 10) - 1;
-        if (isNaN(d) || isNaN(m)) return "28 червня";
-        var dateObj = new Date(2026, m, d);
+        var parsed = parseDateObject(str);
+        var dateObj = new Date(2026, parsed.month - 1, parsed.day);
         dateObj.setDate(dateObj.getDate() + 6);
         return dateObj.getDate() + " " + months[dateObj.getMonth()];
     }
 
     function cleanSongField(name) {
         var clean = name.replace(/&amp;#39;/g, "'").replace(/&#39;/g, "'").trim();
-        
-        // Массив хвостиков для удаления в конце названия песни
         var trash = [" 3", " 2", " 1", " 2s", " 3d", " ч.3.", " ч.3", " ч.2", " ч.1"];
         for (var i = 0; i < trash.length; i++) {
             if (clean.endsWith(trash[i])) {
@@ -154,7 +155,7 @@
 
         for(var k=0; k<list.length; k++) {
             if(!lbls[k]) break;
-            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успішно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
+            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успешно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
             var div = document.createElement('div'); div.className = 'text-item';
             div.innerHTML = '<div class="text-content">' + txt + '</div>';
             var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
