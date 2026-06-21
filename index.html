@@ -67,30 +67,35 @@
         setTimeout(function() { btn.innerText = 'Копіювати'; btn.style.background = '#34495e'; }, 1000);
     }
 
-    function parseDateObject(str) {
-        var clean = str.trim().replace(/[^\d]/g, '');
-        var d = 22, m = 6;
-        if (str.indexOf('.') !== -1) {
-            var parts = str.split('.');
-            if(parts.length >= 2) { d = parseInt(parts[0], 10); m = parseInt(parts[1], 10); }
-        } else if (clean.length >= 4) {
-            d = parseInt(clean.substring(0, 2), 10);
-            m = parseInt(clean.substring(2, 4), 10);
+    function parseDateSmart(str) {
+        var clean = str.trim();
+        var d = new Date();
+        var day = d.getDate();
+        var month = d.getMonth() + 1;
+
+        // Варіант 1: якщо у рядку є точки (наприклад: 22.06 або 22.06.2026)
+        if (clean.indexOf('.') !== -1) {
+            var parts = clean.split('.');
+            if (parts.length >= 2) {
+                var p0 = parseInt(parts[0].replace(/[^\d]/g, ''), 10);
+                var p1 = parseInt(parts[1].replace(/[^\d]/g, ''), 10);
+                if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; }
+            }
+        } 
+        // Варіант 2: якщо це суцільні цифри без крапок (наприклад: 220626 або 2206)
+        else {
+            var digits = clean.replace(/[^\d]/g, '');
+            if (digits.length >= 4) {
+                var p0 = parseInt(digits.substring(0, 2), 10);
+                var p1 = parseInt(digits.substring(2, 4), 10);
+                if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; }
+            }
         }
-        if (isNaN(d) || isNaN(m) || m < 1 || m > 12) { d = 22; m = 6; }
-        return { day: d, month: m };
-    }
 
-    function convertDateToText(str) {
-        var parsed = parseDateObject(str);
-        return parsed.day + " " + months[parsed.month - 1];
-    }
+        if (month < 1 || month > 12) month = 6;
+        if (day < 1 || day > 31) day = 22;
 
-    function getEndDateText(str) {
-        var parsed = parseDateObject(str);
-        var dateObj = new Date(2026, parsed.month - 1, parsed.day);
-        dateObj.setDate(dateObj.getDate() + 6);
-        return dateObj.getDate() + " " + months[dateObj.getMonth()];
+        return { day: day, month: month };
     }
 
     function cleanSongField(name) {
@@ -112,8 +117,15 @@
         var out = document.getElementById('out-songs'); out.innerHTML = ''; list = [];
         if(lines.length < 2) { alert('Введіть дату в першому рядку і пісні нижче!'); return; }
         
-        var rawDate = lines[0];
-        var formattedDate = convertDateToText(rawDate);
+        var rawDateLine = lines[0];
+        var parsed = parseDateSmart(rawDateLine);
+        
+        var formattedDate = parsed.day + " " + months[parsed.month - 1];
+        
+        var endObj = new Date(2026, parsed.month - 1, parsed.day);
+        endObj.setDate(endObj.getDate() + 6);
+        var endDate = endObj.getDate() + " " + months[endObj.getMonth()];
+
         var mode = document.querySelector('input[name="mode"]:checked').value;
 
         for(var j=1; j<lines.length; j++) {
@@ -134,7 +146,6 @@
             if(mode === 'reg') {
                 txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nХочу повідомити, що пісня «" + artist + "» — «" + song + "» " + formattedDate + " стартуватиме в ротації Радіо Промінь. Перший ефір відбудеться о «" + time + "».";
             } else {
-                var endDate = getEndDateText(rawDate);
                 txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець. Хочу повідомити, що пісня «" + artist + "» — «" + song + "» завтра (" + formattedDate + ") стартуватиме на Радіо Промінь в рубриці «Промінь рекомендує». Перший ефір буде завтра о «" + time + "». Гратиме щодня протягом тижня (до неділі, " + endDate + " включно) 1–2 рази на день в цій же рубриці в різний час, а потім переходить в загальну ротацію.";
             }
 
@@ -155,7 +166,7 @@
 
         for(var k=0; k<list.length; k++) {
             if(!lbls[k]) break;
-            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успешно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
+            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успішно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
             var div = document.createElement('div'); div.className = 'text-item';
             div.innerHTML = '<div class="text-content">' + txt + '</div>';
             var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
