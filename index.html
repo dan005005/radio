@@ -283,111 +283,98 @@
         }
         return htmlResult;
     }
-    function getDatabaseRows() {
-        var rows = [];
-        var trs = document.getElementById('table-body').getElementsByTagName('tr');
-        for(var i=0; i<trs.length; i++) {
-            var artist = trs[i].querySelector('.c-artist').value.trim();
-            if(artist === "") continue;
-            
-            rows.push({
-                searchName: artist.toLowerCase(),
-                artist: artist,
-                realName: trs[i].querySelector('.c-name').value.trim(),
-                role: trs[i].querySelector('.c-role').value.trim(),
-                place: trs[i].querySelector('.c-place').value.trim(),
-                bMonth: trs[i].querySelector('.c-m').value.trim(),
-                bDay: trs[i].querySelector('.c-d').value.trim(),
-                tg: trs[i].querySelector('.c-tg').value.trim(),
-                inst: trs[i].querySelector('.c-inst').value.trim(),
-                fb: trs[i].querySelector('.c-fb').value.trim(),
-                phone: trs[i].querySelector('.c-phone').value.trim(),
-                mName: trs[i].querySelector('.c-mname').value.trim(),
-                mPos: trs[i].querySelector('.c-mpos').value.trim(),
-                mTg: trs[i].querySelector('.c-mtg').value.trim(),
-                mInst: trs[i].querySelector('.c-minst').value.trim(),
-                mPhone: trs[i].querySelector('.c-mphone').value.trim()
-            });
-        }
-        return rows;
-    }
-
-    function splitArtistsSmart(artistField) {
-        var text = artistField.trim();
-        var exceptions = ["время и стекло", "потап и настя", "міша крупін і корупція", "інді та друзі"];
-        var lowerText = text.toLowerCase();
-        
-        for(var e=0; e<exceptions.length; e++) {
-            if(lowerText === exceptions[e]) return [text];
-        }
-        
-        var normalized = text;
-        normalized = normalized.replace(/\s*,\s*/g, "||");
-        normalized = normalized.replace(/\s+і\s+/gi, "||");
-        normalized = normalized.replace(/\s+та\s+/gi, "||");
-        normalized = normalized.replace(/\s+&\s+/g, "||");
-        normalized = normalized.replace(/\s*\+\s*/g, "||");
-        normalized = normalized.replace(/\s+and\s+/gi, "||");
-        normalized = normalized.replace(/\s+feat\.?\s+/gi, "||");
-        normalized = normalized.replace(/\s+ft\.?\s+/gi, "||");
-        
-        var rawNames = normalized.split("||");
-        var finalNames = [];
-        for(var i=0; i<rawNames.length; i++) {
-            var name = rawNames[i].trim();
-            if(name !== "") finalNames.push(name);
-        }
-        return finalNames;
-    }
-
-    function findContacts(artistField) {
-        var db = getDatabaseRows();
-        var names = splitArtistsSmart(artistField);
-        var htmlResult = "";
-
-        for (var i = 0; i < names.length; i++) {
-            var searchName = names[i].trim();
-            if (searchName === '') continue;
-            
-            var lowerSearch = searchName.toLowerCase();
-            var matches = [];
-            
-            for (var k = 0; k < db.length; k++) {
-                var dbName = db[k].searchName;
-                if (dbName === lowerSearch || lowerSearch.indexOf(dbName) !== -1 || dbName.indexOf(lowerSearch) !== -1) {
-                    matches.push(db[k]);
-                }
+    function parseDateSmart(str) {
+        var clean = str.trim(); var d = new Date(); var day = d.getDate(); var month = d.getMonth() + 1;
+        if (clean.indexOf('.') !== -1) {
+            var parts = clean.split('.');
+            if (parts.length >= 2) {
+                var p0 = parseInt(parts[0].replace(/[^\d]/g, ''), 10);
+                var p1 = parseInt(parts[1].replace(/[^\d]/g, ''), 10);
+                if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; }
             }
-            
-            if (matches.length > 0) {
-                htmlResult += "<div style='margin-bottom: 10px; border-bottom: 1px dotted #e2e8f0; padding-bottom: 5px;'>";
-                htmlResult += "🎵 <b>" + searchName + "</b> (знайдено карток учасників: " + matches.length + "):<br>";
-                
-                for(var m=0; m<matches.length; m++) {
-                    var matched = matches[m];
-                    htmlResult += "<div style='margin-left: 15px; margin-top: 4px; background: #f8fafc; padding: 4px 8px; border-radius: 4px;'>";
-                    htmlResult += "▪️ <b>" + (matched.realName || "Учасник") + "</b>" + (matched.role ? " — <i>" + matched.role + "</i>" : "") + "<br>";
-                    
-                    var infoParts = [];
-                    if (matched.tg) infoParts.push("<b>TG:</b> " + matched.tg);
-                    if (matched.inst) infoParts.push("<b>Inst:</b> " + matched.inst);
-                    if (matched.phone) infoParts.push("<b>Тел:</b> " + matched.phone);
-                    if (matched.place) infoParts.push("<b>Звідки:</b> " + matched.place);
-                    if (infoParts.length > 0) htmlResult += " &nbsp; " + infoParts.join(" | ") + "<br>";
-                    
-                    if (matched.mName || matched.mTg || matched.mPhone) {
-                        var mParts = [];
-                        if (matched.mPos) mParts.push("<i>" + matched.mPos + "</i>");
-                        if (matched.mTg) mParts.push("<b>TG:</b> " + matched.mTg);
-                        if (matched.mPhone) mParts.push("<b>Тел:</b> " + matched.mPhone);
-                        htmlResult += " &nbsp; 💼 <b>Менеджер:</b> " + (matched.mName || "Контакт") + " (" + mParts.join(" | ") + ")<br>";
-                    }
-                    htmlResult += "</div>";
-                }
-                htmlResult += "</div>";
+        } else {
+            var digits = clean.replace(/[^\d]/g, '');
+            if (digits.length >= 4) {
+                var p0 = parseInt(digits.substring(0, 2), 10);
+                var p1 = parseInt(digits.substring(2, 4), 10);
+                if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; }
+            }
+        }
+        if (month < 1 || month > 12) month = 6; if (day < 1 || day > 31) day = 22;
+        return { day: day, month: month };
+    }
+
+    function cleanSongField(name) {
+        var clean = name.replace(/&amp;#39;/g, "'").replace(/&#39;/g, "'").trim();
+        var trash = [" 3", " 2", " 1", " 2s", " 3d", " ч.3.", " ч.3", " ч.2", " ч.1"];
+        for (var i = 0; i < trash.length; i++) {
+            if (clean.endsWith(trash[i])) { clean = clean.substring(0, clean.length - trash[i].length).trim(); }
+        }
+        return clean;
+    }
+
+    function goSongs() {
+        var raw = document.getElementById('input-songs').value.split('\n');
+        var lines = [];
+        for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lines.push(raw[i].trim()); }
+        var out = document.getElementById('out-songs'); out.innerHTML = ''; list = [];
+        if(lines.length < 2) { alert('Введіть дату в першому рядку і пісні нижче!'); return; }
+        
+        var rawDateLine = lines[0]; var parsed = parseDateSmart(rawDateLine);
+        var formattedDate = parsed.day + " " + months[parsed.month - 1];
+        var endObj = new Date(2026, parsed.month - 1, parsed.day); endObj.setDate(endObj.getDate() + 6);
+        var endDate = endObj.getDate() + " " + months[endObj.getMonth()];
+        var mode = document.querySelector('input[name="mode"]:checked').value;
+
+        for(var j=1; j<lines.length; j++) {
+            var currentLine = lines[j]; var dotIndex = currentLine.indexOf('.');
+            var withoutNumber = dotIndex !== -1 ? currentLine.substring(dotIndex + 1).trim() : currentLine;
+            var parts = withoutNumber.split(/[-–—]/);
+            if(parts.length < 2) continue;
+
+            var artist = parts[0].trim(); var song = parts[1].trim(); var time = parts[2] ? parts[2].trim() : '00:00';
+            if (parts.length > 3) { time = parts[parts.length-1].trim(); song = ""; for(var x=1; x<parts.length-1; x++) { song += (x>1 ? " - " : "") + parts[x]; } }
+            song = cleanSongField(song); list.push({a: artist, s: song});
+
+            var txt = '';
+            if(mode === 'reg') {
+                txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nХочу повідомити, що пісня «" + artist + "» — «" + song + "» " + formattedDate + " стартуватиме в ротації Радіо Промінь. Перший ефір відбудеться о «" + time + "».";
             } else {
-                htmlResult += "<div style='margin-bottom: 5px;'>❌ <strong>" + searchName + ":</strong> <span style='color:#94a3b8;'>контакти відсутні в базі</span></div>";
+                txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець. Хочу повідомити, що пісня «" + artist + "» — «" + song + "» завтра (" + formattedDate + ") стартуватиме на Радіо Промінь в рубриці «Промінь рекомендує». Перший ефір буде завтра о «" + time + "». Гратиме щодня протягом тижня (до неділі, " + endDate + " включно) 1–2 рази на день в цій же рубриці в різний час, а потім переходить в загальну ротацію.";
             }
+
+            var div = document.createElement('div'); div.className = 'text-item';
+            div.innerHTML = '<div class="text-content">' + txt + '</div>';
+            var contactsHtml = findContacts(artist);
+            var contactsDiv = document.createElement('div'); contactsDiv.className = 'contacts-block';
+            contactsDiv.innerHTML = contactsHtml; div.appendChild(contactsDiv);
+            var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
+            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
+            div.appendChild(b); out.appendChild(div);
         }
-        return htmlResult;
     }
+
+    function goLabels() {
+        var raw = document.getElementById('input-labels').value.split('\n');
+        var lbls = [];
+        for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lbls.push(raw[i].trim()); }
+        var out = document.getElementById('out-labels'); out.innerHTML = '';
+        if(list.length === 0) { alert('Спочатку згенеруйте список пісень!'); return; }
+
+        for(var k=0; k<list.length; k++) {
+            if(!lbls[k]) break;
+            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успешно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
+            var div = document.createElement('div'); div.className = 'text-item';
+            div.innerHTML = '<div class="text-content">' + txt + '</div>';
+            var contactsHtml = findContacts(list[k].a);
+            var contactsDiv = document.createElement('div'); contactsDiv.className = 'contacts-block';
+            contactsDiv.innerHTML = contactsHtml; div.appendChild(contactsDiv);
+            var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
+            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
+            div.appendChild(b); out.appendChild(div);
+        }
+    }
+    addTableRow();
+</script>
+</body>
+</html>
