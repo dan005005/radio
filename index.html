@@ -14,390 +14,135 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         textarea { width: 100%; height: 160px; padding: 10px; box-sizing: border-box; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; }
-        button { padding: 12px 20px; background: #2ecc71; color: white; border: none; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; display: inline-block; margin-right: 10px; }
+        button { padding: 12px 20px; background: #2ecc71; color: white; border: none; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 4px; }
         button:hover { background: #27ae60; }
-        .btn-blue { background: #3498db; } .btn-blue:hover { background: #2980b9; }
-        .btn-red { background: #e74c3c; padding: 6px 10px; font-size: 12px; } .btn-red:hover { background: #c0392b; }
-        
+        .btn-blue { background: #3498db; }
+        .btn-red { background: #e74c3c; padding: 6px 10px; font-size: 12px; }
         .text-item { background: #eef2f5; border-left: 5px solid #3498db; padding: 15px; margin-top: 15px; border-radius: 4px; position: relative; }
-        .item-header { font-weight: bold; color: #2c3e50; margin-bottom: 10px; font-size: 14px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px; padding-right: 110px; }
-        .copy-btn { position: absolute; top: 12px; right: 15px; width: auto; padding: 6px 12px; font-size: 12px; background: #34495e; color: white; border: none; border-radius: 4px; cursor: pointer; z-index: 10; }
-        .text-content { font-size: 14px; line-height: 1.5; margin-right: 110px; white-space: pre-wrap; }
-        .contacts-block { margin-top: 12px; padding: 12px; border-top: 1px dashed #cbd5e1; font-size: 13px; color: #334155; line-height: 1.6; background: #fff; border-radius: 4px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
-        .contact-row { margin-bottom: 6px; display: block; }
+        .item-header { font-weight: bold; color: #2c3e50; margin-bottom: 10px; font-size: 14px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px; }
+        .copy-btn { position: absolute; top: 12px; right: 15px; padding: 6px 12px; font-size: 12px; background: #34495e; color: white; cursor: pointer; border: none; border-radius: 4px; }
+        .text-content { font-size: 14px; line-height: 1.5; white-space: pre-wrap; }
+        .contacts-block { margin-top: 12px; padding: 12px; border-top: 1px dashed #cbd5e1; font-size: 13px; background: #fff; }
         .contact-link { color: #3498db; text-decoration: none; font-weight: bold; }
-        .contact-link:hover { text-decoration: underline; }
-        .hint { color: #7f8c8d; font-size: 13px; margin-top: 2px; line-height: 1.4; margin-bottom: 12px; }
-        .table-wrapper { width: 100%; overflow-x: auto; border: 1px solid #ddd; margin-top: 15px; border-radius: 4px; max-height: 400px; }
-        .artist-table { width: 2200px; border-collapse: collapse; background: white; font-size: 13px; table-layout: fixed; }
-        .artist-table th { background: #f8fafc; padding: 10px; text-align: left; border-bottom: 2px solid #ddd; position: sticky; top: 0; color: #334155; font-size: 11px; text-transform: uppercase; }
-        .artist-table td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
-        .artist-table input { width: 100%; border: none; background: transparent; font-size: 13px; padding: 4px; box-sizing: border-box; }
-        .artist-table input:focus { background: #f0fdf4; outline: 1px solid #2ecc71; border-radius: 2px; }
-        .bulk-copy-container { margin-top: 20px; padding: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; text-align: center; display: none; }
+        .table-wrapper { width: 100%; overflow-x: auto; margin-top: 15px; border: 1px solid #ddd; }
+        .artist-table { width: 2200px; border-collapse: collapse; font-size: 13px; }
+        .artist-table th, .artist-table td { padding: 8px; border: 1px solid #e2e8f0; }
+        .artist-table input { width: 100%; border: none; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>📻  Генератор текстів — Радіо Промінь</h2>
+    <h2>📻 Генератор текстів — Радіо Промінь</h2>
     <div class="tabs">
         <button class="tab-btn active" id="t1" onclick="tab('songs')">1. Пісні</button>
         <button class="tab-btn" id="t2" onclick="tab('labels')">2. Лейбли</button>
         <button class="tab-btn" id="t3" onclick="tab('database')">3. Base Контактів</button>
     </div>
+
     <div id="songs" class="tab-content active">
-        <textarea id="input-songs" placeholder="22.06&#10;1. renie cares, 5entave, toni saksofoni і СТРУКТУРА ЩАСТЯ - Трек - 15:00"></textarea>
+        <textarea id="input-songs" placeholder="22.06&#10;1. Артист - Трек - 15:00"></textarea>
         <div style="margin: 10px 0;">
             <label><input type="radio" name="mode" value="reg" checked> Звичайна ротація</label>
             <label style="margin-left: 20px;"><input type="radio" name="mode" value="prom"> Промінь рекомендує</label>
         </div>
         <button style="width:100%;" onclick="goSongs()">Згенерувати тексти</button>
         <div id="out-songs"></div>
-        <div id="bulk-songs-container" class="bulk-copy-container">
-            <button class="btn-blue" style="width: 100%; max-width: 400px;" onclick="copyAllGenerated('out-songs')">📋 Скопіювати ВСІ тексти листів за раз</button>
-        </div>
     </div>
+
     <div id="labels" class="tab-content">
         <textarea id="input-labels" placeholder="Введіть лейбли, кожен з нового рядка"></textarea>
         <button style="width:100%;" onclick="goLabels()">Згенерувати лейбли</button>
         <div id="out-labels"></div>
-        <div id="bulk-labels-container" class="bulk-copy-container">
-            <button class="btn-blue" style="width: 100%; max-width: 400px;" onclick="copyAllGenerated('out-labels')">📋 Скопіювати ВСІ тексти для лейблів за раз</button>
-        </div>
     </div>
+
     <div id="database" class="tab-content">
-        <div class="hint">Скопіюйте рядки з Excel та натисніть «Вставити з Excel». Пошук йде за 100% точним збігом стовпця "Артист"! Посилання стануть активними!</div>
-        <div style="margin-bottom: 10px;">
-            <button class="btn-blue" onclick="pasteFromExcel()">📋 Вставити з Excel</button>
-            <button onclick="addTableRow()">➕ Додати порожній рядок</button>
-            <button class="btn-red" style="background:#94a3b8;" onclick="document.getElementById('table-body').innerHTML=''; addTableRow();">🗑️ Очистити все</button>
-        </div>
+        <button onclick="pasteFromExcel()">📋 Вставити з Excel</button>
+        <button onclick="addTableRow()">➕ Додати рядок</button>
         <div class="table-wrapper">
             <table class="artist-table">
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">№</th><th style="width: 150px;">Артист</th><th style="width: 140px;">Ім'я/Прізвище</th><th style="width: 100px;">Роль</th><th style="width: 200px;">Місце народження/створення</th><th style="width: 110px;">Місяць нар.</th><th style="width: 90px;">День нар.</th><th style="width: 120px;">ТГ Артиста</th><th style="width: 130px;">Instagram Артиста</th><th style="width: 120px;">FB Артиста</th><th style="width: 120px;">Phone Артиста</th><th style="width: 140px;">Ім'я Менеджера</th><th style="width: 120px;">Посада Мен.</th><th style="width: 120px;">ТГ Менеджера</th><th style="width: 130px;">Instagram Мен.</th><th style="width: 120px;">Phone Менеджера</th><th style="width: 60px;">Дія</th>
-                    </tr>
-                </thead>
                 <tbody id="table-body"></tbody>
             </table>
         </div>
     </div>
 </div>
+
 <script>
     var list = [];
     var months = ["січня", "лютого", "березня", "квітня", "травня", "червня", "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"];
-    function tab(name) {
-        document.getElementById('songs').className = 'tab-content';
-        document.getElementById('labels').className = 'tab-content';
-        document.getElementById('database').className = 'tab-content';
-        document.getElementById('t1').className = 'tab-btn';
-        document.getElementById('t2').className = 'tab-btn';
-        document.getElementById('t3').className = 'tab-btn';
-        document.getElementById(name).className = 'tab-content active';
-        document.getElementById(name === 'songs' ? 't1' : (name === 'labels' ? 't2' : 't3')).className = 'tab-btn active';
+    
+    function tab(n) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(n).classList.add('active');
+        document.getElementById(n === 'songs' ? 't1' : (n === 'labels' ? 't2' : 't3')).classList.add('active');
     }
 
     function copy(btn, txt) {
-        var el = document.createElement('textarea');
-        el.value = txt;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
+        navigator.clipboard.writeText(txt);
         btn.innerText = 'Готово!';
-        btn.style.background = '#2ecc71';
-        setTimeout(function() {
-            btn.innerText = 'Копіювати';
-            btn.style.background = '#34495e';
-        }, 1000);
+        setTimeout(() => btn.innerText = 'Копіювати', 1000);
     }
 
-    function copyAllGenerated(containerId) {
-        var items = document.getElementById(containerId).getElementsByClassName('text-content');
-        var allText = "";
-        for (var i = 0; i < items.length; i++) {
-            allText += items[i].innerText + "\n\n========================================\n\n";
-        }
-        var el = document.createElement('textarea');
-        el.value = allText.trim();
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        alert("Усі тексти успішно скопійовано!");
-    }
-
-    function addTableRow(v0="",v1="",v2="",v3="",v4="",v5="",v6="",v7="",v8="",v9="",v10="",v11="",v12="",v13="",v14="",v15="") {
-        var tbody = document.getElementById('table-body');
+    function addTableRow() {
         var tr = document.createElement('tr');
-        tr.innerHTML = '<td><input type="text" class="c-num" value="'+v0+'"></td><td><input type="text" class="c-artist" value="'+v1+'"></td><td><input type="text" class="c-name" value="'+v2+'"></td><td><input type="text" class="c-role" value="'+v3+'"></td><td><input type="text" class="c-place" value="'+v4+'"></td><td><input type="text" class="c-m" value="'+v5+'"></td><td><input type="text" class="c-d" value="'+v6+'"></td><td><input type="text" class="c-tg" value="'+v7+'"></td><td><input type="text" class="c-inst" value="'+v8+'"></td><td><input type="text" class="c-fb" value="'+v9+'"></td><td><input type="text" class="c-phone" value="'+v10+'"></td><td><input type="text" class="c-mname" value="'+v11+'"></td><td><input type="text" class="c-mpos" value="'+v12+'"></td><td><input type="text" class="c-mtg" value="'+v13+'"></td><td><input type="text" class="c-minst" value="'+v14+'"></td><td><input type="text" class="c-mphone" value="'+v15+'"></td><td style="text-align:center;"><button class="btn-red" onclick="this.parentElement.parentElement.remove()">❌</button></td>';
-        tbody.appendChild(tr);
-    }
-    function pasteFromExcel() {
-        navigator.clipboard.readText().then(function(text) {
-            if (!text || text.trim() === "") return;
-            var lines = text.split('\n');
-            document.getElementById('table-body').innerHTML = "";
-            var added = 0;
-            var lastValidArtist = "";
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i].trim();
-                if (line === "" || line.indexOf("АРТИСТ") !== -1) continue;
-                var c = line.split('\t');
-                if (c.length < 2) continue;
-                var v = [];
-                for (var j = 0; j < 16; j++) {
-                    v.push(c[j] ? c[j].trim() : "");
-                }
-                if (v[1] === "" && lastValidArtist !== "") {
-                    v[1] = lastValidArtist;
-                } else if (v[1] !== "") {
-                    lastValidArtist = v[1];
-                }
-                addTableRow(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]);
-                added++;
-            }
-            alert("Імпортовано артистів: " + added);
-        });
-    }
-
-    function getDatabaseRows() {
-        var rows = [];
-        var trs = document.getElementById('table-body').getElementsByTagName('tr');
-        for (var i = 0; i < trs.length; i++) {
-            var art = trs[i].querySelector('.c-artist').value.trim();
-            if (art === "") continue;
-            rows.push({
-                searchName: art.toLowerCase(),
-                artist: art,
-                realName: trs[i].querySelector('.c-name').value.trim(),
-                role: trs[i].querySelector('.c-role').value.trim(),
-                place: trs[i].querySelector('.c-place').value.trim(),
-                tg: trs[i].querySelector('.c-tg').value.trim(),
-                inst: trs[i].querySelector('.c-inst').value.trim(),
-                fb: trs[i].querySelector('.c-fb').value.trim(),
-                phone: trs[i].querySelector('.c-phone').value.trim(),
-                mName: trs[i].querySelector('.c-mname').value.trim(),
-                mPos: trs[i].querySelector('.c-mpos').value.trim(),
-                mTg: trs[i].querySelector('.c-mtg').value.trim(),
-                mInst: trs[i].querySelector('.c-minst').value.trim(),
-                mPhone: trs[i].querySelector('.c-mphone').value.trim()
-            });
-        }
-        return rows;
-    }
-    function splitArtistsSmart(artistField) {
-        var text = artistField.trim();
-        var ex = ["время и стекло", "потап и настя", "міша крупін і корупція", "інді та друзі"];
-        for (var e = 0; e < ex.length; e++) {
-            if (text.toLowerCase() === ex[e]) return [text];
-        }
-        var norm = text.replace(/\s*,\s*/g, "||").replace(/\s+і\s+/gi, "||").replace(/\s+та\s+/gi, "||").replace(/\s+&\s+/g, "||").replace(/\s*\+\s*/g, "||").replace(/\s+and\s+/gi, "||").replace(/\s+feat\.?\s+/gi, "||").replace(/\s+ft\.?\s+/gi, "||");
-        return norm.split("||").map(function(n) { return n.trim(); }).filter(function(n) { return n !== ""; });
-    }
-
-    function makeLink(val, type) {
-        if (!val || val.trim() === "" || val.trim() === "-") return "";
-        var clean = val.trim();
-        if (type === 'tg' || type === 'inst') {
-            var nick = clean.replace("@", "");
-            return '<a class="contact-link" href="https://' + (type === 'tg' ? 't.me' : 'instagram.com') + '/' + nick + '" target="_blank">' + clean + '</a>';
-        }
-        if (type === 'fb') {
-            return '<a class="contact-link" href="' + (clean.startsWith("http") ? clean : 'https://facebook.com' + clean) + '" target="_blank">Facebook</a>';
-        }
-        if (type === 'phone') {
-            return '<a class="contact-link" href="tel:' + clean.replace(/[^\d+]/g, "") + '">' + clean + '</a>';
-        }
-        return clean;
-    }
-    function findContacts(artistField) {
-        var db = getDatabaseRows();
-        var names = splitArtistsSmart(artistField);
-        var htmlResult = "";
-        for (var i = 0; i < names.length; i++) {
-            var sName = names[i].trim();
-            if (sName === '') continue;
-            var lowS = sName.toLowerCase();
-            var matches = [];
-            for (var k = 0; k < db.length; k++) {
-                if (db[k].searchName === lowS) {
-                    matches.push(db[k]);
-                }
-            }
-            if (matches.length > 0) {
-                htmlResult += "<div style='margin-bottom: 8px;'>🎵 <b>" + sName + "</b> (Знайдено: " + matches.length + "):<br>";
-                for (var m = 0; m < matches.length; m++) {
-                    var h = matches[m];
-                    htmlResult += "<div style='margin-left:15px; background:#f8fafc; padding:8px; border-radius:4px; margin-top:6px;'>";
-                    htmlResult += "<div class='contact-row'>▪️ <b>" + (h.realName || "Учасник") + "</b>" + (h.role ? " (" + h.role + ")" : "") + (h.place ? " | Звідки: " + h.place : "") + "</div>";
-                    
-                    var tgL = makeLink(h.tg, 'tg'); if (tgL) htmlResult += "<div class='contact-row'>📱 <b>Telegram:</b> " + tgL + "</div>";
-                    var instL = makeLink(h.inst, 'inst'); if (instL) htmlResult += "<div class='contact-row'>📸 <b>Instagram:</b> " + instL + "</div>";
-                    var fbL = makeLink(h.fb, 'fb'); if (fbL) htmlResult += "<div class='contact-row'>🌐 <b>Facebook:</b> " + fbL + "</div>";
-                    var phL = makeLink(h.phone, 'phone'); if (phL) htmlResult += "<div class='contact-row'>📞 <b>Телефон:</b> " + phL + "</div>";
-                    
-                    if (h.mName || h.mTg || h.mPhone) {
-                        htmlResult += "<div class='contact-row' style='margin-top:6px; padding-top:4px; border-top:1px dashed #e2e8f0;'>💼 <b>Менеджер:</b> " + (h.mName || "Контакт") + (h.mPos ? " (<i>" + h.mPos + "</i>)" : "") + "</div>";
-                        var mtgL = makeLink(h.mTg, 'tg'); if (mtgL) htmlResult += "<div class='contact-row'>&nbsp;&nbsp;&nbsp;&nbsp;📱 <b>Telegram менеджера:</b> " + mtgL + "</div>";
-                        var minstL = makeLink(h.mInst, 'inst'); if (minstL) htmlResult += "<div class='contact-row'>&nbsp;&nbsp;&nbsp;&nbsp;📸 <b>Instagram менеджера:</b> " + minstL + "</div>";
-                        var mphL = makeLink(h.mPhone, 'phone'); if (mphL) htmlResult += "<div class='contact-row'>&nbsp;&nbsp;&nbsp;&nbsp;📞 <b>Телефон менеджера:</b> " + mphL + "</div>";
-                    }
-                    htmlResult += "</div>";
-                }
-                htmlResult += "</div>";
-            } else {
-                htmlResult += "<div style='margin-bottom: 4px;'>❌ <strong>" + sName + ":</strong> <span style='color:#94a3b8;'>контакти відсутні в базі</span></div>";
-            }
-        }
-        return htmlResult;
-    }
-
-    function parseDateSmart(linesArray) {
-        var firstLine = linesArray ? linesArray.trim() : "";
-        var d = new Date();
-        var day = d.getDate();
-        var month = d.getMonth() + 1;
-        if (firstLine.indexOf('.') !== -1) {
-            var p = firstLine.split('.');
-            if (p.length >= 2) {
-                day = parseInt(p.replace(/[^\d]/g, ''), 10);
-                month = parseInt(p.replace(/[^\d]/g, ''), 10);
-            }
-        } else {
-            var dig = firstLine.replace(/[^\d]/g, '');
-            if (dig.length >= 4) {
-                day = parseInt(dig.substring(0, 2), 10);
-                month = parseInt(dig.substring(2, 4), 10);
-            }
-        }
-        if (month < 1 || month > 12) month = 6;
-        if (day < 1 || day > 31) day = 22;
-        return { day: day, month: month };
-    }
-
-    function cleanSongField(name) {
-        var clean = name.replace(/&amp;#39;/g, "'").replace(/&#39;/g, "'").trim();
-        clean = clean.replace(/\s*[\(\[][^)]*?(clean|censored|explicit|radio|edit|official|video|audio|version)[^)]*?[\)\]]/gi, "").trim();
-        clean = clean.replace(/\s+\d+[a-zA-Zа-яА-ЯіІ]*\s*$/g, "");
-        clean = clean.replace(/\s+ч\.\d+\.*\s*$/g, "");
-        return clean.trim();
+        tr.innerHTML = '<td><input type="text" class="c-artist" placeholder="Артист"></td><td><input type="text" class="c-name" placeholder="Ім’я"></td><td><input type="text" class="c-tg" placeholder="ТГ"></td><td style="text-align:center;"><button class="btn-red" onclick="this.parentElement.parentElement.remove()">❌</button></td>';
+        document.getElementById('table-body').appendChild(tr);
     }
 
     function goSongs() {
-        var raw = document.getElementById('input-songs').value.split('\n');
-        var lines = [];
-        for (var i = 0; i < raw.length; i++) {
-            if (raw[i].trim() !== '') lines.push(raw[i].trim());
-        }
+        var lines = document.getElementById('input-songs').value.split('\n').filter(l => l.trim() !== '');
+        if (lines.length < 2) { alert('Введіть дані!'); return; }
+        
         var out = document.getElementById('out-songs');
         out.innerHTML = '';
         list = [];
-        if (lines.length < 2) {
-            alert('Введіть дані!');
-            return;
-        }
-        var parsed = parseDateSmart(lines);
-        var formattedDate = parsed.day + " " + months[parsed.month - 1];
-        var endObj = new Date(2026, parsed.month - 1, parsed.day);
-        endObj.setDate(endObj.getDate() + 6);
-        var endDate = endObj.getDate() + " " + months[endObj.getMonth()];
+        
         var mode = document.querySelector('input[name="mode"]:checked').value;
+        
         for (var j = 1; j < lines.length; j++) {
-            var cur = lines[j];
-            var idx = cur.indexOf('.');
-            var withoutNum = idx !== -1 ? cur.substring(idx + 1).trim() : cur;
-            var parts = withoutNum.split(/[-–—]/);
+            var parts = lines[j].replace(/^\d+\.\s*/, '').split(/[-–—]/).map(p => p.trim());
             if (parts.length < 2) continue;
-            var art = parts.trim();
-            var sng = parts.trim();
-            var time = parts ? parts.trim() : '00:00';
-            if (parts.length > 3) {
-                time = parts[parts.length - 1].trim();
-                sng = "";
-                for (var x = 1; x < parts.length - 1; x++) {
-                    sng += (x > 1 ? " - " : "") + parts[x];
-                }
-            }
-            sng = cleanSongField(sng);
+            
+            var art = parts[0];
+            var sng = parts[1];
+            var time = parts[2] || "00:00";
             list.push({ a: art, s: sng });
+            
             var txt = mode === 'reg' ? 
-                "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nХочу повідомити, що пісня «" + art + "» — «" + sng + "» " + formattedDate + " стартуватиме в ротації Радіо Промінь. Перший ефір відбудеться о «" + time + "»." :
-                "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець. Хочу повідомити, що пісня «" + art + "» — «" + sng + "» завтра (" + formattedDate + ") стартуватиме на Радіо Промінь в рубриці «Промінь рекомендує». Перший ефір буде завтра о «" + time + "». Гратиме щодня протягом тижня (до неділі, " + endDate + " включно) 1–2 рази на день в цій же рубриці в різний час, а потім переходить в загальну ротацію.";
+                `Вітаю. Вас турбує гостьова редакторка Радіо Промінь. Пісня «${art}» — «${sng}» стартує в ротації. Перший ефір о ${time}.` :
+                `Вітаю. Пісня «${art}» — «${sng}» стартує в рубриці «Промінь рекомендує». Ефір о ${time}.`;
             
             var div = document.createElement('div');
             div.className = 'text-item';
-            
-            var headerDiv = document.createElement('div');
-            headerDiv.className = 'item-header';
-            headerDiv.innerText = "Пункт " + j + " | Виконавець: " + art;
-            div.appendChild(headerDiv);
-            
-            var contentDiv = document.createElement('div');
-            contentDiv.className = 'text-content';
-            contentDiv.innerText = txt;
-            div.appendChild(contentDiv);
-            
-            var cHtml = findContacts(art);
-            var cDiv = document.createElement('div');
-            cDiv.className = 'contacts-block';
-            cDiv.innerHTML = cHtml;
-            div.appendChild(cDiv);
-            
-            var b = document.createElement('button');
-            b.className = 'copy-btn';
-            b.innerText = 'Копіювати';
-            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
-            div.appendChild(b);
+            div.innerHTML = `<div class='item-header'>Виконавець: ${art}</div><div class='text-content'>${txt}</div>`;
+            var btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.innerText = 'Копіювати';
+            btn.onclick = () => copy(btn, txt);
+            div.appendChild(btn);
             out.appendChild(div);
         }
-        document.getElementById('bulk-songs-container').style.display = list.length > 0 ? 'block' : 'none';
     }
 
     function goLabels() {
-        var raw = document.getElementById('input-labels').value.split('\n');
-        var lbls = [];
-        for (var i = 0; i < raw.length; i++) {
-            if (raw[i].trim() !== '') lbls.push(raw[i].trim());
-        }
+        var lbls = document.getElementById('input-labels').value.split('\n').filter(l => l.trim() !== '');
         var out = document.getElementById('out-labels');
         out.innerHTML = '';
-        if (list.length === 0) {
-            alert('Спочатку сформуйте список пісень!');
-            return;
-        }
-        for (var k = 0; k < list.length; k++) {
-            if (!lbls[k]) break;
-            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успішно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
+        list.forEach((item, i) => {
+            if (!lbls[i]) return;
+            var txt = `Вітаю. Трек «${item.s}» від «${item.a}» додано до ефірної сітки під лейблом «${lbls[i]}». Дякуємо!`;
             var div = document.createElement('div');
             div.className = 'text-item';
-            
-            var headerDiv = document.createElement('div');
-            headerDiv.className = 'item-header';
-            headerDiv.innerText = "Пункт " + (k + 1) + " | Лейбл: " + lbls[k];
-            div.appendChild(headerDiv);
-            
-            var contentDiv = document.createElement('div');
-            contentDiv.className = 'text-content';
-            contentDiv.innerText = txt;
-            div.appendChild(contentDiv);
-            
-            var cHtml = findContacts(list[k].a);
-            var cDiv = document.createElement('div');
-            cDiv.className = 'contacts-block';
-            cDiv.innerHTML = cHtml;
-            div.appendChild(cDiv);
-            
-            var b = document.createElement('button');
-            b.className = 'copy-btn';
-            b.innerText = 'Копіювати';
-            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
-            div.appendChild(b);
+            div.innerHTML = `<div class='item-header'>Лейбл: ${lbls[i]}</div><div class='text-content'>${txt}</div>`;
+            var btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.innerText = 'Копіювати';
+            btn.onclick = () => copy(btn, txt);
+            div.appendChild(btn);
             out.appendChild(div);
-        }
-        document.getElementById('bulk-labels-container').style.display = lbls.length > 0 ? 'block' : 'none';
+        });
     }
+
     addTableRow();
 </script>
 </body>
