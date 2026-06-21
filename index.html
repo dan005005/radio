@@ -23,7 +23,6 @@
         .text-content { font-size: 14px; line-height: 1.5; margin-right: 110px; white-space: pre-wrap; }
         .contacts-block { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; font-size: 13px; color: #334155; line-height: 1.5; background: #fff; padding: 10px; border-radius: 4px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); }
         .hint { color: #7f8c8d; font-size: 13px; margin-top: 2px; line-height: 1.4; margin-bottom: 12px; }
-        
         .table-wrapper { width: 100%; overflow-x: auto; border: 1px solid #ddd; margin-top: 15px; border-radius: 4px; max-height: 400px; }
         .artist-table { width: 2200px; border-collapse: collapse; background: white; font-size: 13px; table-layout: fixed; }
         .artist-table th { background: #f8fafc; padding: 10px; text-align: left; border-bottom: 2px solid #ddd; position: sticky; top: 0; color: #334155; font-size: 11px; text-transform: uppercase; }
@@ -33,16 +32,13 @@
     </style>
 </head>
 <body>
-
 <div class="container">
     <h2>📻  Генератор текстів — Радіо Промінь</h2>
-    
     <div class="tabs">
         <button class="tab-btn active" id="t1" onclick="tab('songs')">1. Пісні</button>
         <button class="tab-btn" id="t2" onclick="tab('labels')">2. Лейбли</button>
         <button class="tab-btn" id="t3" onclick="tab('database')">3. Base Контактів</button>
     </div>
-
     <div id="songs" class="tab-content active">
         <textarea id="input-songs" placeholder="22.06&#10;1. renie cares, 5entave, toni saksofoni і СТРУКТУРА ЩАСТЯ - Трек - 15:00"></textarea>
         <div style="margin: 10px 0;">
@@ -52,22 +48,18 @@
         <button style="width:100%;" onclick="goSongs()">Згенерувати тексти</button>
         <div id="out-songs"></div>
     </div>
-
     <div id="labels" class="tab-content">
         <textarea id="input-labels" placeholder="Введіть лейбли, кожен з нового рядка"></textarea>
         <button style="width:100%;" onclick="goLabels()">Згенерувати лейбли</button>
         <div id="out-labels"></div>
     </div>
-
     <div id="database" class="tab-content">
-        <div class="hint">Скопіюйте рядки з Excel (всі стовпці від № до PHONE МЕНЕДЖЕРА) та натисніть «Вставити з Excel». Програма розуміє складні переліки артистів через коми та «і»!</div>
-        
+        <div class="hint">Скопіюйте рядки з Excel (всі стовпці від № до PHONE МЕНЕДЖЕРА) та натисніть «Вставити з Excel». Пошук контактів йде строго за стовпцем "Артист"!</div>
         <div style="margin-bottom: 10px;">
             <button class="btn-blue" onclick="pasteFromExcel()">📋 Вставити з Excel</button>
             <button onclick="addTableRow()">➕ Додати порожній рядок</button>
             <button class="btn-red" style="background:#94a3b8;" onclick="document.getElementById('table-body').innerHTML=''; addTableRow();">🗑️ Очистити все</button>
         </div>
-
         <div class="table-wrapper">
             <table class="artist-table">
                 <thead>
@@ -91,8 +83,7 @@
                         <th style="width: 60px;">Дія</th>
                     </tr>
                 </thead>
-                <tbody id="table-body">
-                </tbody>
+                <tbody id="table-body"></tbody>
             </table>
         </div>
     </div>
@@ -100,7 +91,6 @@
 <script>
     var list = [];
     var months = ["січня", "лютого", "березня", "квітня", "травня", "червня", "липня", "серпня", "вересня", "жовтня", "листопада", "грудня"];
-
     function tab(name) {
         document.getElementById('songs').className = 'tab-content';
         document.getElementById('labels').className = 'tab-content';
@@ -111,14 +101,12 @@
         document.getElementById(name).className = 'tab-content active';
         document.getElementById(name === 'songs' ? 't1' : (name === 'labels' ? 't2' : 't3')).className = 'tab-btn active';
     }
-
     function copy(btn, txt) {
         var el = document.createElement('textarea'); el.value = txt; document.body.appendChild(el); el.select();
         document.execCommand('copy'); document.body.removeChild(el);
         btn.innerText = 'Готово!'; btn.style.background = '#2ecc71';
         setTimeout(function() { btn.innerText = 'Копіювати'; btn.style.background = '#34495e'; }, 1000);
     }
-
     function addTableRow(v0="", v1="", v2="", v3="", v4="", v5="", v6="", v7="", v8="", v9="", v10="", v11="", v12="", v13="", v14="", v15="") {
         var tbody = document.getElementById('table-body');
         var tr = document.createElement('tr');
@@ -142,131 +130,72 @@
             '<td style="text-align:center;"><button class="btn-red" onclick="this.parentElement.parentElement.remove()">❌</button></td>';
         tbody.appendChild(tr);
     }
-
     function pasteFromExcel() {
         navigator.clipboard.readText().then(function(text) {
             if(!text || text.trim() === "") { alert("Буфер порожній. Скопіюйте дані з Excel!"); return; }
             var lines = text.split('\n');
             var tbody = document.getElementById('table-body');
-            tbody.innerHTML = ""; 
-            var addedCount = 0;
-            var lastValidArtist = ""; 
-            
+            tbody.innerHTML = ""; var addedCount = 0; var lastValidArtist = "";
             for(var i=0; i<lines.length; i++) {
                 var line = lines[i].trim();
-                if(line === "" || line.indexOf("АРТИСТ") !== -1) continue; 
-                var c = line.split('\t');
-                if(c.length < 2) continue;
-                
-                var v = [];
-                for(var j=0; j<16; j++) { v.push(c[j] ? c[j].trim() : ""); }
-                
-                if (v[1] === "" && lastValidArtist !== "") {
-                    v[1] = lastValidArtist;
-                } else if (v[1] !== "") {
-                    lastValidArtist = v[1];
-                }
-                
+                if(line === "" || line.indexOf("АРТИСТ") !== -1) continue;
+                var c = line.split('\t'); if(c.length < 2) continue;
+                var v = []; for(var j=0; j<16; j++) { v.push(c[j] ? c[j].trim() : ""); }
+                if (v[1] === "" && lastValidArtist !== "") { v[1] = lastValidArtist; } else if (v[1] !== "") { lastValidArtist = v[1]; }
                 addTableRow(v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15]);
                 addedCount++;
             }
             alert("Дані успішно імпортовано! Додано рядків артистів: " + addedCount);
-        }).catch(function(err) {
-            alert("Не вдалося автоматично зчитати буфер.");
-        });
+        }).catch(function(err) { alert("Не вдалося зчитати буфер."); });
     }
     function getDatabaseRows() {
-        var rows = [];
-        var trs = document.getElementById('table-body').getElementsByTagName('tr');
+        var rows = []; var trs = document.getElementById('table-body').getElementsByTagName('tr');
         for(var i=0; i<trs.length; i++) {
-            var artist = trs[i].querySelector('.c-artist').value.trim();
-            if(artist === "") continue;
-            
+            var artist = trs[i].querySelector('.c-artist').value.trim(); if(artist === "") continue;
             rows.push({
-                searchName: artist.toLowerCase(),
-                artist: artist,
-                realName: trs[i].querySelector('.c-name').value.trim(),
-                role: trs[i].querySelector('.c-role').value.trim(),
-                place: trs[i].querySelector('.c-place').value.trim(),
-                bMonth: trs[i].querySelector('.c-m').value.trim(),
-                bDay: trs[i].querySelector('.c-d').value.trim(),
-                tg: trs[i].querySelector('.c-tg').value.trim(),
-                inst: trs[i].querySelector('.c-inst').value.trim(),
-                fb: trs[i].querySelector('.c-fb').value.trim(),
-                phone: trs[i].querySelector('.c-phone').value.trim(),
-                mName: trs[i].querySelector('.c-mname').value.trim(),
-                mPos: trs[i].querySelector('.c-mpos').value.trim(),
-                mTg: trs[i].querySelector('.c-mtg').value.trim(),
-                mInst: trs[i].querySelector('.c-minst').value.trim(),
-                mPhone: trs[i].querySelector('.c-mphone').value.trim()
+                searchName: artist.toLowerCase(), artist: artist, realName: trs[i].querySelector('.c-name').value.trim(),
+                role: trs[i].querySelector('.c-role').value.trim(), place: trs[i].querySelector('.c-place').value.trim(),
+                bMonth: trs[i].querySelector('.c-m').value.trim(), bDay: trs[i].querySelector('.c-d').value.trim(),
+                tg: trs[i].querySelector('.c-tg').value.trim(), inst: trs[i].querySelector('.c-inst').value.trim(),
+                fb: trs[i].querySelector('.c-fb').value.trim(), phone: trs[i].querySelector('.c-phone').value.trim(),
+                mName: trs[i].querySelector('.c-mname').value.trim(), mPos: trs[i].querySelector('.c-mpos').value.trim(),
+                mTg: trs[i].querySelector('.c-mtg').value.trim(), mInst: trs[i].querySelector('.c-minst').value.trim(), mPhone: trs[i].querySelector('.c-mphone').value.trim()
             });
         }
         return rows;
     }
-
     function splitArtistsSmart(artistField) {
         var text = artistField.trim();
         var exceptions = ["время и стекло", "потап и настя", "міша крупін і корупція", "інді та друзі"];
         var lowerText = text.toLowerCase();
-        
-        for(var e=0; e<exceptions.length; e++) {
-            if(lowerText === exceptions[e]) return [text];
-        }
-        
-        var normalized = text;
-        normalized = normalized.replace(/\s*,\s*/g, "||");
-        normalized = normalized.replace(/\s+і\s+/gi, "||");
-        normalized = normalized.replace(/\s+та\s+/gi, "||");
-        normalized = normalized.replace(/\s+&\s+/g, "||");
-        normalized = normalized.replace(/\s*\+\s*/g, "||");
-        normalized = normalized.replace(/\s+and\s+/gi, "||");
-        normalized = normalized.replace(/\s+feat\.?\s+/gi, "||");
-        normalized = normalized.replace(/\s+ft\.?\s+/gi, "||");
-        
-        var rawNames = normalized.split("||");
-        var finalNames = [];
-        for(var i=0; i<rawNames.length; i++) {
-            var name = rawNames[i].trim();
-            if(name !== "") finalNames.push(name);
-        }
+        for(var e=0; e<exceptions.length; e++) { if(lowerText === exceptions[e]) return [text]; }
+        var normalized = text.replace(/\s*,\s*/g, "||").replace(/\s+і\s+/gi, "||").replace(/\s+та\s+/gi, "||").replace(/\s+&\s+/g, "||").replace(/\s*\+\s*/g, "||").replace(/\s+and\s+/gi, "||").replace(/\s+feat\.?\s+/gi, "||").replace(/\s+ft\.?\s+/gi, "||");
+        var rawNames = normalized.split("||"); var finalNames = [];
+        for(var i=0; i<rawNames.length; i++) { var name = rawNames[i].trim(); if(name !== "") finalNames.push(name); }
         return finalNames;
     }
-
     function findContacts(artistField) {
-        var db = getDatabaseRows();
-        var names = splitArtistsSmart(artistField);
-        var htmlResult = "";
-
+        var db = getDatabaseRows(); var names = splitArtistsSmart(artistField); var htmlResult = "";
         for (var i = 0; i < names.length; i++) {
-            var searchName = names[i].trim();
-            if (searchName === '') continue;
-            
-            var lowerSearch = searchName.toLowerCase();
-            var matches = [];
-            
+            var searchName = names[i].trim(); if (searchName === '') continue;
+            var lowerSearch = searchName.toLowerCase(); var matches = [];
             for (var k = 0; k < db.length; k++) {
                 var dbName = db[k].searchName;
-                if (dbName === lowerSearch || lowerSearch.indexOf(dbName) !== -1 || dbName.indexOf(lowerSearch) !== -1) {
-                    matches.push(db[k]);
-                }
+                if (dbName === lowerSearch || lowerSearch.indexOf(dbName) !== -1 || dbName.indexOf(lowerSearch) !== -1) { matches.push(db[k]); }
             }
-            
             if (matches.length > 0) {
                 htmlResult += "<div style='margin-bottom: 10px; border-bottom: 1px dotted #e2e8f0; padding-bottom: 5px;'>";
                 htmlResult += "🎵 <b>" + searchName + "</b> (знайдено карток учасників: " + matches.length + "):<br>";
-                
                 for(var m=0; m<matches.length; m++) {
                     var matched = matches[m];
                     htmlResult += "<div style='margin-left: 15px; margin-top: 4px; background: #f8fafc; padding: 4px 8px; border-radius: 4px;'>";
                     htmlResult += "▪️ <b>" + (matched.realName || "Учасник") + "</b>" + (matched.role ? " — <i>" + matched.role + "</i>" : "") + "<br>";
-                    
                     var infoParts = [];
                     if (matched.tg) infoParts.push("<b>TG:</b> " + matched.tg);
                     if (matched.inst) infoParts.push("<b>Inst:</b> " + matched.inst);
                     if (matched.phone) infoParts.push("<b>Тел:</b> " + matched.phone);
                     if (matched.place) infoParts.push("<b>Звідки:</b> " + matched.place);
                     if (infoParts.length > 0) htmlResult += " &nbsp; " + infoParts.join(" | ") + "<br>";
-                    
                     if (matched.mName || matched.mTg || matched.mPhone) {
                         var mParts = [];
                         if (matched.mPos) mParts.push("<i>" + matched.mPos + "</i>");
@@ -277,104 +206,64 @@
                     htmlResult += "</div>";
                 }
                 htmlResult += "</div>";
-            } else {
-                htmlResult += "<div style='margin-bottom: 5px;'>❌ <strong>" + searchName + ":</strong> <span style='color:#94a3b8;'>контакти відсутні в базі</span></div>";
-            }
+            } else { htmlResult += "<div style='margin-bottom: 5px;'>❌ <strong>" + searchName + ":</strong> <span style='color:#94a3b8;'>контакти відсутні в базі</span></div>"; }
         }
         return htmlResult;
-    }    function parseDateSmart(str) {
+    }
+    function parseDateSmart(str) {
         var clean = str.trim(); var d = new Date(); var day = d.getDate(); var month = d.getMonth() + 1;
         if (clean.indexOf('.') !== -1) {
-            var parts = clean.split('.');
-            if (parts.length >= 2) {
-                var p0 = parseInt(parts[0].replace(/[^\d]/g, ''), 10);
-                var p1 = parseInt(parts[1].replace(/[^\d]/g, ''), 10);
-                if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; }
-            }
+            var parts = clean.split('.'); if (parts.length >= 2) { var p0 = parseInt(parts.replace(/[^\d]/g, ''), 10); var p1 = parseInt(parts.replace(/[^\d]/g, ''), 10); if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; } }
         } else {
-            var digits = clean.replace(/[^\d]/g, '');
-            if (digits.length >= 4) {
-                var p0 = parseInt(digits.substring(0, 2), 10);
-                var p1 = parseInt(digits.substring(2, 4), 10);
-                if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; }
-            }
+            var digits = clean.replace(/[^\d]/g, ''); if (digits.length >= 4) { var p0 = parseInt(digits.substring(0, 2), 10); var p1 = parseInt(digits.substring(2, 4), 10); if (!isNaN(p0) && !isNaN(p1)) { day = p0; month = p1; } }
         }
         if (month < 1 || month > 12) month = 6; if (day < 1 || day > 31) day = 22;
         return { day: day, month: month };
     }
-
     function cleanSongField(name) {
         var clean = name.replace(/&amp;#39;/g, "'").replace(/&#39;/g, "'").trim();
         var trash = [" 3", " 2", " 1", " 2s", " 3d", " ч.3.", " ч.3", " ч.2", " ч.1"];
-        for (var i = 0; i < trash.length; i++) {
-            if (clean.endsWith(trash[i])) { clean = clean.substring(0, clean.length - trash[i].length).trim(); }
-        }
+        for (var i = 0; i < trash.length; i++) { if (clean.endsWith(trash[i])) { clean = clean.substring(0, clean.length - trash[i].length).trim(); } }
         return clean;
     }
-
     function goSongs() {
         var raw = document.getElementById('input-songs').value.split('\n');
-        var lines = [];
-        for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lines.push(raw[i].trim()); }
+        var lines = []; for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lines.push(raw[i].trim()); }
         var out = document.getElementById('out-songs'); out.innerHTML = ''; list = [];
         if(lines.length < 2) { alert('Введіть дату в першому рядку і пісні нижче!'); return; }
-        
-        var rawDateLine = lines[0]; var parsed = parseDateSmart(rawDateLine);
-        var formattedDate = parsed.day + " " + months[parsed.month - 1];
-        var endObj = new Date(2026, parsed.month - 1, parsed.day); endObj.setDate(endObj.getDate() + 6);
-        var endDate = endObj.getDate() + " " + months[endObj.getMonth()];
+        var rawDateLine = lines; var parsed = parseDateSmart(rawDateLine); var formattedDate = parsed.day + " " + months[parsed.month - 1];
+        var endObj = new Date(2026, parsed.month - 1, parsed.day); endObj.setDate(endObj.getDate() + 6); var endDate = endObj.getDate() + " " + months[endObj.getMonth()];
         var mode = document.querySelector('input[name="mode"]:checked').value;
-
         for(var j=1; j<lines.length; j++) {
             var currentLine = lines[j]; var dotIndex = currentLine.indexOf('.');
             var withoutNumber = dotIndex !== -1 ? currentLine.substring(dotIndex + 1).trim() : currentLine;
-            var parts = withoutNumber.split(/[-–—]/);
-            if(parts.length < 2) continue;
-
-            var artist = parts[0].trim(); var song = parts[1].trim(); var time = parts[2] ? parts[2].trim() : '00:00';
+            var parts = withoutNumber.split(/[-–—]/); if(parts.length < 2) continue;
+            var artist = parts.trim(); var song = parts.trim(); var time = parts ? parts.trim() : '00:00';
             if (parts.length > 3) { time = parts[parts.length-1].trim(); song = ""; for(var x=1; x<parts.length-1; x++) { song += (x>1 ? " - " : "") + parts[x]; } }
             song = cleanSongField(song); list.push({a: artist, s: song});
-
-            var txt = '';
-            if(mode === 'reg') {
-                txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nХочу повідомити, що пісня «" + artist + "» — «" + song + "» " + formattedDate + " стартуватиме в ротації Радіо Промінь. Перший ефір відбудеться о «" + time + "».";
-            } else {
-                txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець. Хочу повідомити, що пісня «" + artist + "» — «" + song + "» завтра (" + formattedDate + ") стартуватиме на Радіо Промінь в рубриці «Промінь рекомендує». Перший ефір буде завтра о «" + time + "». Гратиме щодня протягом тижня (до неділі, " + endDate + " включно) 1–2 рази на день в цій же рубриці в різний час, а потім переходить в загальну ротацію.";
-            }
-
-            var div = document.createElement('div'); div.className = 'text-item';
-            div.innerHTML = '<div class="text-content">' + txt + '</div>';
-            var contactsHtml = findContacts(artist);
-            var contactsDiv = document.createElement('div'); contactsDiv.className = 'contacts-block';
-            contactsDiv.innerHTML = contactsHtml; div.appendChild(contactsDiv);
+            var txt = mode === 'reg' ? 
+                "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nХочу повідомити, що пісня «" + artist + "» — «" + song + "» " + formattedDate + " стартуватиме в ротації Радіо Промінь. Перший ефір відбудеться о «" + time + "»." :
+                "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець. Хочу повідомити, що пісня «" + artist + "» — «" + song + "» завтра (" + formattedDate + ") стартуватиме на Радіо Промінь в рубриці «Промінь рекомендує». Перший ефір буде завтра о «" + time + "». Гратиме щодня протягом тижня (до неділі, " + endDate + " включно) 1–2 рази на день в цій же рубриці в різний час, а потім переходить в загальну ротацію.";
+            var div = document.createElement('div'); div.className = 'text-item'; div.innerHTML = '<div class="text-content">' + txt + '</div>';
+            var contactsHtml = findContacts(artist); var contactsDiv = document.createElement('div'); contactsDiv.className = 'contacts-block'; contactsDiv.innerHTML = contactsHtml; div.appendChild(contactsDiv);
             var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
-            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
-            div.appendChild(b); out.appendChild(div);
+            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b); div.appendChild(b); out.appendChild(div);
         }
     }
-
     function goLabels() {
         var raw = document.getElementById('input-labels').value.split('\n');
-        var lbls = [];
-        for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lbls.push(raw[i].trim()); }
-        var out = document.getElementById('out-labels'); out.innerHTML = '';
-        if(list.length === 0) { alert('Спочатку згенеруйте список пісень!'); return; }
-
+        var lbls = []; for(var i=0; i<raw.length; i++) { if(raw[i].trim() !== '') lbls.push(raw[i].trim()); }
+        var out = document.getElementById('out-labels'); out.innerHTML = ''; if(list.length === 0) { alert('Спочатку згенеруйте список пісень!'); return; }
         for(var k=0; k<list.length; k++) {
             if(!lbls[k]) break;
-            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успешно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
-            var div = document.createElement('div'); div.className = 'text-item';
-            div.innerHTML = '<div class="text-content">' + txt + '</div>';
-            var contactsHtml = findContacts(list[k].a);
-            var contactsDiv = document.createElement('div'); contactsDiv.className = 'contacts-block';
-            contactsDiv.innerHTML = contactsHtml; div.appendChild(contactsDiv);
+            var txt = "Вітаю. Вас турбує гостьова редакторка Радіо Промінь Вікторія Липовець.\n\nПовідомляємо, що трек «" + list[k].s + "» від виконавця «" + list[k].a + "» успішно додано до ефірної сітки під лейблом «" + lbls[k] + "». Дякуємо за співпрацю!";
+            var div = document.createElement('div'); div.className = 'text-item'; div.innerHTML = '<div class="text-content">' + txt + '</div>';
+            var contactsHtml = findContacts(list[k].a); var contactsDiv = document.createElement('div'); contactsDiv.className = 'contacts-block'; contactsDiv.innerHTML = contactsHtml; div.appendChild(contactsDiv);
             var b = document.createElement('button'); b.className = 'copy-btn'; b.innerText = 'Копіювати';
-            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b);
-            div.appendChild(b); out.appendChild(div);
+            b.onclick = (function(t, btn) { return function() { copy(btn, t); }; })(txt, b); div.appendChild(b); out.appendChild(div);
         }
     }
     addTableRow();
 </script>
 </body>
 </html>
-
